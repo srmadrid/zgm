@@ -1,2 +1,1 @@
-# zgm
-Zig Graphics Mathematics
+# ZGM: Zig Graphics Mathematics
