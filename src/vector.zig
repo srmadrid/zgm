@@ -1,4 +1,14 @@
 const std = @import("std");
+const zgm = @import("zgm.zig");
+const Matrix2x2 = zgm.Matrix2x2;
+const Matrix2x3 = zgm.Matrix2x3;
+const Matrix2x4 = zgm.Matrix2x4;
+const Matrix3x2 = zgm.Matrix3x2;
+const Matrix3x3 = zgm.Matrix3x3;
+const Matrix3x4 = zgm.Matrix3x4;
+const Matrix4x2 = zgm.Matrix4x2;
+const Matrix4x3 = zgm.Matrix4x3;
+const Matrix4x4 = zgm.Matrix4x4;
 
 /// A two-dimensional vector.
 pub fn Vector2(comptime T: type) type {
@@ -19,14 +29,6 @@ pub fn Vector2(comptime T: type) type {
             };
         }
 
-        pub inline fn x(self: *const Vector2(T)) T {
-            return self.v[0];
-        }
-
-        pub inline fn y(self: *const Vector2(T)) T {
-            return self.v[1];
-        }
-
         /// Creates a new vector with the given scalar value in all components.
         ///
         /// **Parameters**:
@@ -38,6 +40,14 @@ pub fn Vector2(comptime T: type) type {
             return Vector2(T){
                 .v = @splat(s),
             };
+        }
+
+        pub inline fn x(self: *const Vector2(T)) T {
+            return self.v[0];
+        }
+
+        pub inline fn y(self: *const Vector2(T)) T {
+            return self.v[1];
         }
 
         /// Element-wise addition.
@@ -135,6 +145,72 @@ pub fn Vector2(comptime T: type) type {
         pub inline fn mulScalar(v: *const Vector2(T), s: T) Vector2(T) {
             return Vector2(T){
                 .v = v.v * @Vector(2, T){ s, s },
+            };
+        }
+
+        /// Vector2-Matrix2x2 multiplication:
+        ///
+        /// :math:`\mathbf{v}^\top \mathbf{A}`
+        ///
+        /// Note: Non-standard operation.
+        ///
+        /// **Parameters**:
+        /// - `v`: The vector.
+        /// - `A`: The matrix.
+        ///
+        /// **Returns**:
+        /// - The product of the vector and matrix.
+        pub inline fn mulMatrix2x2(v: *const Vector2(T), A: *const Matrix2x2(T)) Vector2(T) {
+            return Vector2(T){
+                .v = @Vector(2, T){
+                    v.v[0] * A.m[0].v[0] + v.v[1] * A.m[0].v[1],
+                    v.v[0] * A.m[1].v[0] + v.v[1] * A.m[1].v[1],
+                },
+            };
+        }
+
+        /// Vector2-Matrix2x3 multiplication:
+        ///
+        /// :math:`\mathbf{v}^\top \mathbf{A}`
+        ///
+        /// Note: Non-standard operation.
+        ///
+        /// **Parameters**:
+        /// - `v`: The vector.
+        /// - `A`: The matrix.
+        ///
+        /// **Returns**:
+        /// - The product of the vector and matrix.
+        pub inline fn mulMatrix2x3(v: *const Vector2(T), A: *const Matrix2x3(T)) Vector3(T) {
+            return Vector3(T){
+                .v = @Vector(3, T){
+                    v.v[0] * A.m[0].v[0] + v.v[1] * A.m[0].v[1],
+                    v.v[0] * A.m[1].v[0] + v.v[1] * A.m[1].v[1],
+                    v.v[0] * A.m[2].v[0] + v.v[1] * A.m[2].v[1],
+                },
+            };
+        }
+
+        /// Vector2-Matrix2x4 multiplication:
+        ///
+        /// :math:`\mathbf{v}^\top \mathbf{A}`
+        ///
+        /// Note: Non-standard operation.
+        ///
+        /// **Parameters**:
+        /// - `v`: The vector.
+        /// - `A`: The matrix.
+        ///
+        /// **Returns**:
+        /// - The product of the vector and matrix.
+        pub inline fn mulMatrix2x4(v: *const Vector2(T), A: *const Matrix2x4(T)) Vector4(T) {
+            return Vector4(T){
+                .v = @Vector(4, T){
+                    v.v[0] * A.m[0].v[0] + v.v[1] * A.m[0].v[1],
+                    v.v[0] * A.m[1].v[0] + v.v[1] * A.m[1].v[1],
+                    v.v[0] * A.m[2].v[0] + v.v[1] * A.m[2].v[1],
+                    v.v[0] * A.m[3].v[0] + v.v[1] * A.m[3].v[1],
+                },
             };
         }
 
@@ -549,6 +625,72 @@ pub fn Vector3(comptime T: type) type {
         pub inline fn mulScalar(v: *const Vector3(T), s: T) Vector3(T) {
             return Vector3(T){
                 .v = v.v * @Vector(3, T){ s, s, s },
+            };
+        }
+
+        /// Vector3-Matrix3x2 multiplication:
+        ///
+        /// :math:`\mathbf{v}^\top \mathbf{A}`
+        ///
+        /// Note: Non-standard operation.
+        ///
+        /// **Parameters**:
+        /// - `v`: The vector.
+        /// - `A`: The matrix.
+        ///
+        /// **Returns**:
+        /// - The product of the vector and matrix.
+        pub inline fn mulMatrix3x2(v: *const Vector3(T), A: *const Matrix3x2(T)) Vector2(T) {
+            return Vector2(T){
+                .v = @Vector(2, T){
+                    v.v[0] * A.m[0].v[0] + v.v[1] * A.m[0].v[1] + v.v[2] * A.m[0].v[2],
+                    v.v[0] * A.m[1].v[0] + v.v[1] * A.m[1].v[1] + v.v[2] * A.m[1].v[2],
+                },
+            };
+        }
+
+        /// Vector3-Matrix3x3 multiplication:
+        ///
+        /// :math:`\mathbf{v}^\top \mathbf{A}`
+        ///
+        /// Note: Non-standard operation.
+        ///
+        /// **Parameters**:
+        /// - `v`: The vector.
+        /// - `A`: The matrix.
+        ///
+        /// **Returns**:
+        /// - The product of the vector and matrix.
+        pub inline fn mulMatrix3x3(v: *const Vector3(T), A: *const Matrix3x3(T)) Vector3(T) {
+            return Vector3(T){
+                .v = @Vector(3, T){
+                    v.v[0] * A.m[0].v[0] + v.v[1] * A.m[0].v[1] + v.v[2] * A.m[0].v[2],
+                    v.v[0] * A.m[1].v[0] + v.v[1] * A.m[1].v[1] + v.v[2] * A.m[1].v[2],
+                    v.v[0] * A.m[2].v[0] + v.v[1] * A.m[2].v[1] + v.v[2] * A.m[2].v[2],
+                },
+            };
+        }
+
+        /// Vector3-Matrix3x4 multiplication:
+        ///
+        /// :math:`\mathbf{v}^\top \mathbf{A}`
+        ///
+        /// Note: Non-standard operation.
+        ///
+        /// **Parameters**:
+        /// - `v`: The vector.
+        /// - `A`: The matrix.
+        ///
+        /// **Returns**:
+        /// - The product of the vector and matrix.
+        pub inline fn mulMatrix3x4(v: *const Vector3(T), A: *const Matrix3x4(T)) Vector4(T) {
+            return Vector4(T){
+                .v = @Vector(4, T){
+                    v.v[0] * A.m[0].v[0] + v.v[1] * A.m[0].v[1] + v.v[2] * A.m[0].v[2],
+                    v.v[0] * A.m[1].v[0] + v.v[1] * A.m[1].v[1] + v.v[2] * A.m[1].v[2],
+                    v.v[0] * A.m[2].v[0] + v.v[1] * A.m[2].v[1] + v.v[2] * A.m[2].v[2],
+                    v.v[0] * A.m[3].v[0] + v.v[1] * A.m[3].v[1] + v.v[2] * A.m[3].v[2],
+                },
             };
         }
 
@@ -991,6 +1133,72 @@ pub fn Vector4(comptime T: type) type {
             };
         }
 
+        /// Vector4-Matrix4x2 multiplication:
+        ///
+        /// :math:`\mathbf{v}^\top \mathbf{A}`
+        ///
+        /// Note: Non-standard operation.
+        ///
+        /// **Parameters**:
+        /// - `v`: The vector.
+        /// - `A`: The matrix.
+        ///
+        /// **Returns**:
+        /// - The product of the vector and matrix.
+        pub inline fn mulMatrix4x2(v: *const Vector4(T), A: *const Matrix4x2(T)) Vector2(T) {
+            return Vector2(T){
+                .v = @Vector(2, T){
+                    v.v[0] * A.m[0].v[0] + v.v[1] * A.m[0].v[1] + v.v[2] * A.m[0].v[2] + v.v[3] * A.m[0].v[3],
+                    v.v[0] * A.m[1].v[0] + v.v[1] * A.m[1].v[1] + v.v[2] * A.m[1].v[2] + v.v[3] * A.m[1].v[3],
+                },
+            };
+        }
+
+        /// Vector4-Matrix4x3 multiplication:
+        ///
+        /// :math:`\mathbf{v}^\top \mathbf{A}`
+        ///
+        /// Note: Non-standard operation.
+        ///
+        /// **Parameters**:
+        /// - `v`: The vector.
+        /// - `A`: The matrix.
+        ///
+        /// **Returns**:
+        /// - The product of the vector and matrix.
+        pub inline fn mulMatrix4x3(v: *const Vector4(T), A: *const Matrix4x3(T)) Vector3(T) {
+            return Vector3(T){
+                .v = @Vector(3, T){
+                    v.v[0] * A.m[0].v[0] + v.v[1] * A.m[0].v[1] + v.v[2] * A.m[0].v[2] + v.v[3] * A.m[0].v[3],
+                    v.v[0] * A.m[1].v[0] + v.v[1] * A.m[1].v[1] + v.v[2] * A.m[1].v[2] + v.v[3] * A.m[1].v[3],
+                    v.v[0] * A.m[2].v[0] + v.v[1] * A.m[2].v[1] + v.v[2] * A.m[2].v[2] + v.v[3] * A.m[2].v[3],
+                },
+            };
+        }
+
+        /// Vector4-Matrix4x4 multiplication:
+        ///
+        /// :math:`\mathbf{v}^\top \mathbf{A}`
+        ///
+        /// Note: Non-standard operation.
+        ///
+        /// **Parameters**:
+        /// - `v`: The vector.
+        /// - `A`: The matrix.
+        ///
+        /// **Returns**:
+        /// - The product of the vector and matrix.
+        pub inline fn mulMatrix4x4(v: *const Vector4(T), A: *const Matrix4x4(T)) Vector4(T) {
+            return Vector4(T){
+                .v = @Vector(4, T){
+                    v.v[0] * A.m[0].v[0] + v.v[1] * A.m[0].v[1] + v.v[2] * A.m[0].v[2] + v.v[3] * A.m[0].v[3],
+                    v.v[0] * A.m[1].v[0] + v.v[1] * A.m[1].v[1] + v.v[2] * A.m[1].v[2] + v.v[3] * A.m[1].v[3],
+                    v.v[0] * A.m[2].v[0] + v.v[1] * A.m[2].v[1] + v.v[2] * A.m[2].v[2] + v.v[3] * A.m[2].v[3],
+                    v.v[0] * A.m[3].v[0] + v.v[1] * A.m[3].v[1] + v.v[2] * A.m[3].v[2] + v.v[3] * A.m[3].v[3],
+                },
+            };
+        }
+
         /// Element-wise division.
         ///
         /// **Parameters**:
@@ -1311,6 +1519,30 @@ test "mulScalar_vector2" {
     try std.testing.expectEqual(true, r.approxEqual(&Vector2(f32).init(3, 6), 0.0001));
 }
 
+test "mulMatrix2x2_vector2" {
+    const v = Vector2(f32).init(1, 2);
+    const m = Matrix2x2(f32).init(3, 4, 5, 6);
+    const r = v.mulMatrix2x2(&m);
+
+    try std.testing.expectEqual(true, r.approxEqual(&Vector2(f32).init(13, 16), 0.0001));
+}
+
+test "mulMatrix2x3_vector2" {
+    const v = Vector2(f32).init(1, 2);
+    const m = Matrix2x3(f32).init(3, 4, 5, 6, 7, 8);
+    const r = v.mulMatrix2x3(&m);
+
+    try std.testing.expectEqual(true, r.approxEqual(&Vector3(f32).init(15, 18, 21), 0.0001));
+}
+
+test "mulMatrix2x4_vector2" {
+    const v = Vector2(f32).init(1, 2);
+    const m = Matrix2x4(f32).init(3, 4, 5, 6, 7, 8, 9, 10);
+    const r = v.mulMatrix2x4(&m);
+
+    try std.testing.expectEqual(true, r.approxEqual(&Vector4(f32).init(17, 20, 23, 26), 0.0001));
+}
+
 test "div_vector2" {
     const v = Vector2(f32).init(1, 2);
     const w = Vector2(f32).init(3, 4);
@@ -1493,6 +1725,30 @@ test "mulScalar_vector3" {
     const r = v.mulScalar(4);
 
     try std.testing.expectEqual(true, r.approxEqual(&Vector3(f32).init(4, 8, 12), 0.0001));
+}
+
+test "mulMatrix3x2_vector3" {
+    const v = Vector3(f32).init(1, 2, 3);
+    const m = Matrix3x2(f32).init(4, 5, 6, 7, 8, 9);
+    const r = v.mulMatrix3x2(&m);
+
+    try std.testing.expectEqual(true, r.approxEqual(&Vector2(f32).init(40, 46), 0.0001));
+}
+
+test "mulMatrix3x3_vector3" {
+    const v = Vector3(f32).init(1, 2, 3);
+    const m = Matrix3x3(f32).init(4, 5, 6, 7, 8, 9, 10, 11, 12);
+    const r = v.mulMatrix3x3(&m);
+
+    try std.testing.expectEqual(true, r.approxEqual(&Vector3(f32).init(48, 54, 60), 0.0001));
+}
+
+test "mulMatrix3x4_vector3" {
+    const v = Vector3(f32).init(1, 2, 3);
+    const m = Matrix3x4(f32).init(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+    const r = v.mulMatrix3x4(&m);
+
+    try std.testing.expectEqual(true, r.approxEqual(&Vector4(f32).init(56, 62, 68, 74), 0.0001));
 }
 
 test "div_vector3" {
@@ -1685,6 +1941,30 @@ test "mulScalar_vector4" {
     const r = v.mulScalar(5);
 
     try std.testing.expectEqual(true, r.approxEqual(&Vector4(f32).init(5, 10, 15, 20), 0.0001));
+}
+
+test "mulMatrix4x2_vector4" {
+    const v = Vector4(f32).init(1, 2, 3, 4);
+    const m = Matrix4x2(f32).init(5, 6, 7, 8, 9, 10, 11, 12);
+    const r = v.mulMatrix4x2(&m);
+
+    try std.testing.expectEqual(true, r.approxEqual(&Vector2(f32).init(90, 100), 0.0001));
+}
+
+test "mulMatrix4x3_vector4" {
+    const v = Vector4(f32).init(1, 2, 3, 4);
+    const m = Matrix4x3(f32).init(5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+    const r = v.mulMatrix4x3(&m);
+
+    try std.testing.expectEqual(true, r.approxEqual(&Vector3(f32).init(110, 120, 130), 0.0001));
+}
+
+test "mulMatrix4x4_vector4" {
+    const v = Vector4(f32).init(1, 2, 3, 4);
+    const m = Matrix4x4(f32).init(5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20);
+    const r = v.mulMatrix4x4(&m);
+
+    try std.testing.expectEqual(true, r.approxEqual(&Vector4(f32).init(130, 140, 150, 160), 0.0001));
 }
 
 test "div_vector4" {
