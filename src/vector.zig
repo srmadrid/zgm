@@ -116,7 +116,7 @@ pub fn Vector2(comptime T: type) type {
         /// - A new vector with the negated components.
         pub inline fn negate(v: *const Vector2(T)) Vector2(T) {
             return Vector2(T){
-                .v = @Vector(2, T){ -v.v[0], -v.v[1] },
+                .v = -v.v,
             };
         }
 
@@ -252,7 +252,7 @@ pub fn Vector2(comptime T: type) type {
         /// **Returns**:
         /// - The modulus of the vector.
         pub inline fn mod(v: *const Vector2(T)) T {
-            return @sqrt(v.v[0] * v.v[0] + v.v[1] * v.v[1]);
+            return @sqrt(@reduce(.Add, v.v * v.v));
         }
 
         /// Computes the squared modulus of a vector:
@@ -265,7 +265,7 @@ pub fn Vector2(comptime T: type) type {
         /// **Returns**:
         /// - The squared modulus of the vector.
         pub inline fn mod2(v: *const Vector2(T)) T {
-            return v.v[0] * v.v[0] + v.v[1] * v.v[1];
+            return @reduce(.Add, v.v * v.v);
         }
 
         /// Normalizes a vector:
@@ -292,7 +292,7 @@ pub fn Vector2(comptime T: type) type {
         /// **Returns**:
         /// - The dot product between the two vectors.
         pub inline fn dot(v: *const Vector2(T), w: *const Vector2(T)) T {
-            return v.v[0] * w.v[0] + v.v[1] * w.v[1];
+            return @reduce(.Add, v.v * w.v);
         }
 
         /// Computes the distance between two vectors:
@@ -596,7 +596,7 @@ pub fn Vector3(comptime T: type) type {
         /// - A new vector with the negated components.
         pub inline fn negate(v: *const Vector3(T)) Vector3(T) {
             return Vector3(T){
-                .v = @Vector(3, T){ -v.v[0], -v.v[1], -v.v[2] },
+                .v = -v.v,
             };
         }
 
@@ -732,7 +732,7 @@ pub fn Vector3(comptime T: type) type {
         /// **Returns**:
         /// - The modulus of the vector.
         pub inline fn mod(v: *const Vector3(T)) T {
-            return @sqrt(v.v[0] * v.v[0] + v.v[1] * v.v[1] + v.v[2] * v.v[2]);
+            return @sqrt(@reduce(.Add, v.v * v.v));
         }
 
         /// Computes the squared modulus of a vector:
@@ -745,7 +745,7 @@ pub fn Vector3(comptime T: type) type {
         /// **Returns**:
         /// - The squared modulus of the vector.
         pub inline fn mod2(v: *const Vector3(T)) T {
-            return v.v[0] * v.v[0] + v.v[1] * v.v[1] + v.v[2] * v.v[2];
+            return @reduce(.Add, v.v * v.v);
         }
 
         /// Normalizes a vector:
@@ -772,7 +772,7 @@ pub fn Vector3(comptime T: type) type {
         /// **Returns**:
         /// - The dot product between the two vectors.
         pub inline fn dot(v: *const Vector3(T), w: *const Vector3(T)) T {
-            return v.v[0] * w.v[0] + v.v[1] * w.v[1] + v.v[2] * w.v[2];
+            return @reduce(.Add, v.v * w.v);
         }
 
         /// Computes the cross product between two vectors:
@@ -1101,7 +1101,7 @@ pub fn Vector4(comptime T: type) type {
         /// - A new vector with the negated components.
         pub inline fn negate(v: *const Vector4(T)) Vector4(T) {
             return Vector4(T){
-                .v = @Vector(4, T){ -v.v[0], -v.v[1], -v.v[2], -v.v[3] },
+                .v = -v.v,
             };
         }
 
@@ -1237,7 +1237,7 @@ pub fn Vector4(comptime T: type) type {
         /// **Returns**:
         /// - The modulus of the vector.
         pub inline fn mod(v: *const Vector4(T)) T {
-            return @sqrt(v.v[0] * v.v[0] + v.v[1] * v.v[1] + v.v[2] * v.v[2] + v.v[3] * v.v[3]);
+            return @sqrt(@reduce(.Add, v.v * v.v));
         }
 
         /// Computes the squared modulus of a vector:
@@ -1250,7 +1250,7 @@ pub fn Vector4(comptime T: type) type {
         /// **Returns**:
         /// - The squared modulus of the vector.
         pub inline fn mod2(v: *const Vector4(T)) T {
-            return v.v[0] * v.v[0] + v.v[1] * v.v[1] + v.v[2] * v.v[2] + v.v[3] * v.v[3];
+            return @reduce(.Add, v.v * v.v);
         }
 
         /// Normalizes a vector:
@@ -1274,7 +1274,7 @@ pub fn Vector4(comptime T: type) type {
         /// - `v`: The first vector.
         /// - `u`: The second vector.
         pub inline fn dot(v: *const Vector4(T), u: *const Vector4(T)) T {
-            return v.v[0] * u.v[0] + v.v[1] * u.v[1] + v.v[2] * u.v[2] + v.v[3] * u.v[3];
+            return @reduce(.Add, v.v * u.v);
         }
 
         /// Computes the distance between two vectors:

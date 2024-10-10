@@ -393,6 +393,17 @@ pub fn Matrix2x2(comptime T: type) type {
                 A.m[0].v[0] * invDet,
             );
         }
+
+        /// Trace of a matrix.
+        ///
+        /// **Parameters**:
+        /// - `A`: The matrix.
+        ///
+        /// **Returns**:
+        /// - The trace of the matrix.
+        pub inline fn trace(A: *const Matrix2x2(T)) T {
+            return A.m[0].v[0] + A.m[1].v[1];
+        }
     };
 }
 
