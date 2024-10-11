@@ -163,8 +163,8 @@ pub fn Vector2(comptime T: type) type {
         pub inline fn mulMatrix2x2(v: *const Vector2(T), A: *const Matrix2x2(T)) Vector2(T) {
             return Vector2(T){
                 .v = @Vector(2, T){
-                    v.v[0] * A.m[0].v[0] + v.v[1] * A.m[0].v[1],
-                    v.v[0] * A.m[1].v[0] + v.v[1] * A.m[1].v[1],
+                    @reduce(.Add, v.v * A.m[0].v),
+                    @reduce(.Add, v.v * A.m[1].v),
                 },
             };
         }
@@ -184,9 +184,9 @@ pub fn Vector2(comptime T: type) type {
         pub inline fn mulMatrix2x3(v: *const Vector2(T), A: *const Matrix2x3(T)) Vector3(T) {
             return Vector3(T){
                 .v = @Vector(3, T){
-                    v.v[0] * A.m[0].v[0] + v.v[1] * A.m[0].v[1],
-                    v.v[0] * A.m[1].v[0] + v.v[1] * A.m[1].v[1],
-                    v.v[0] * A.m[2].v[0] + v.v[1] * A.m[2].v[1],
+                    @reduce(.Add, v.v * A.m[0].v),
+                    @reduce(.Add, v.v * A.m[1].v),
+                    @reduce(.Add, v.v * A.m[2].v),
                 },
             };
         }
@@ -206,10 +206,10 @@ pub fn Vector2(comptime T: type) type {
         pub inline fn mulMatrix2x4(v: *const Vector2(T), A: *const Matrix2x4(T)) Vector4(T) {
             return Vector4(T){
                 .v = @Vector(4, T){
-                    v.v[0] * A.m[0].v[0] + v.v[1] * A.m[0].v[1],
-                    v.v[0] * A.m[1].v[0] + v.v[1] * A.m[1].v[1],
-                    v.v[0] * A.m[2].v[0] + v.v[1] * A.m[2].v[1],
-                    v.v[0] * A.m[3].v[0] + v.v[1] * A.m[3].v[1],
+                    @reduce(.Add, v.v * A.m[0].v),
+                    @reduce(.Add, v.v * A.m[1].v),
+                    @reduce(.Add, v.v * A.m[2].v),
+                    @reduce(.Add, v.v * A.m[3].v),
                 },
             };
         }
@@ -381,7 +381,7 @@ pub fn Vector2(comptime T: type) type {
             return w.mul(&splat(v.dot(w) / w.mod2()));
         }
 
-        /// Reflects a vector against a surface normal:
+        /// Reflects a vector against a normal vector:
         ///
         /// :math:`\mathbf{v} - 2 \frac{\mathbf{v} \cdot \mathbf{n}}{\lVert \mathbf{n} \rVert_2^2} \mathbf{n}`
         ///
@@ -395,7 +395,7 @@ pub fn Vector2(comptime T: type) type {
             return v.sub(&normal.mul(&splat(2 * v.dot(normal) / normal.mod2())));
         }
 
-        /// Refracts a vector against a surface normal:
+        /// Refracts a vector against a normal vector:
         ///
         /// :math:`\eta \mathbf{v} - \left(\eta \mathbf{v} \cdot \mathbf{n} + \sqrt{1 - \eta^2 (1 - (\mathbf{v} \cdot \mathbf{n})^2)}\right) \mathbf{n}`
         ///
@@ -643,8 +643,8 @@ pub fn Vector3(comptime T: type) type {
         pub inline fn mulMatrix3x2(v: *const Vector3(T), A: *const Matrix3x2(T)) Vector2(T) {
             return Vector2(T){
                 .v = @Vector(2, T){
-                    v.v[0] * A.m[0].v[0] + v.v[1] * A.m[0].v[1] + v.v[2] * A.m[0].v[2],
-                    v.v[0] * A.m[1].v[0] + v.v[1] * A.m[1].v[1] + v.v[2] * A.m[1].v[2],
+                    @reduce(.Add, v.v * A.m[0].v),
+                    @reduce(.Add, v.v * A.m[1].v),
                 },
             };
         }
@@ -664,9 +664,9 @@ pub fn Vector3(comptime T: type) type {
         pub inline fn mulMatrix3x3(v: *const Vector3(T), A: *const Matrix3x3(T)) Vector3(T) {
             return Vector3(T){
                 .v = @Vector(3, T){
-                    v.v[0] * A.m[0].v[0] + v.v[1] * A.m[0].v[1] + v.v[2] * A.m[0].v[2],
-                    v.v[0] * A.m[1].v[0] + v.v[1] * A.m[1].v[1] + v.v[2] * A.m[1].v[2],
-                    v.v[0] * A.m[2].v[0] + v.v[1] * A.m[2].v[1] + v.v[2] * A.m[2].v[2],
+                    @reduce(.Add, v.v * A.m[0].v),
+                    @reduce(.Add, v.v * A.m[1].v),
+                    @reduce(.Add, v.v * A.m[2].v),
                 },
             };
         }
@@ -686,10 +686,10 @@ pub fn Vector3(comptime T: type) type {
         pub inline fn mulMatrix3x4(v: *const Vector3(T), A: *const Matrix3x4(T)) Vector4(T) {
             return Vector4(T){
                 .v = @Vector(4, T){
-                    v.v[0] * A.m[0].v[0] + v.v[1] * A.m[0].v[1] + v.v[2] * A.m[0].v[2],
-                    v.v[0] * A.m[1].v[0] + v.v[1] * A.m[1].v[1] + v.v[2] * A.m[1].v[2],
-                    v.v[0] * A.m[2].v[0] + v.v[1] * A.m[2].v[1] + v.v[2] * A.m[2].v[2],
-                    v.v[0] * A.m[3].v[0] + v.v[1] * A.m[3].v[1] + v.v[2] * A.m[3].v[2],
+                    @reduce(.Add, v.v * A.m[0].v),
+                    @reduce(.Add, v.v * A.m[1].v),
+                    @reduce(.Add, v.v * A.m[2].v),
+                    @reduce(.Add, v.v * A.m[3].v),
                 },
             };
         }
@@ -881,7 +881,7 @@ pub fn Vector3(comptime T: type) type {
             return w.mul(&splat(v.dot(w) / w.mod2()));
         }
 
-        /// Reflects a vector against a surface normal:
+        /// Reflects a vector against a normal vector:
         ///
         /// :math:`\mathbf{v} - 2 \frac{\mathbf{v} \cdot \mathbf{n}}{\lVert \mathbf{n} \rVert_2^2} \mathbf{n}`
         ///
@@ -895,7 +895,7 @@ pub fn Vector3(comptime T: type) type {
             return v.sub(&normal.mul(&splat(2 * v.dot(normal) / normal.mod2())));
         }
 
-        /// Refracts a vector against a surface normal:
+        /// Refracts a vector against a normal vector:
         ///
         /// :math:`\eta \mathbf{v} - \left(\eta \mathbf{v} \cdot \mathbf{n} + \sqrt{1 - \eta^2 (1 - (\mathbf{v} \cdot \mathbf{n})^2)}\right) \mathbf{n}`
         ///
@@ -1148,8 +1148,8 @@ pub fn Vector4(comptime T: type) type {
         pub inline fn mulMatrix4x2(v: *const Vector4(T), A: *const Matrix4x2(T)) Vector2(T) {
             return Vector2(T){
                 .v = @Vector(2, T){
-                    v.v[0] * A.m[0].v[0] + v.v[1] * A.m[0].v[1] + v.v[2] * A.m[0].v[2] + v.v[3] * A.m[0].v[3],
-                    v.v[0] * A.m[1].v[0] + v.v[1] * A.m[1].v[1] + v.v[2] * A.m[1].v[2] + v.v[3] * A.m[1].v[3],
+                    @reduce(.Add, v.v * A.m[0].v),
+                    @reduce(.Add, v.v * A.m[1].v),
                 },
             };
         }
@@ -1169,9 +1169,9 @@ pub fn Vector4(comptime T: type) type {
         pub inline fn mulMatrix4x3(v: *const Vector4(T), A: *const Matrix4x3(T)) Vector3(T) {
             return Vector3(T){
                 .v = @Vector(3, T){
-                    v.v[0] * A.m[0].v[0] + v.v[1] * A.m[0].v[1] + v.v[2] * A.m[0].v[2] + v.v[3] * A.m[0].v[3],
-                    v.v[0] * A.m[1].v[0] + v.v[1] * A.m[1].v[1] + v.v[2] * A.m[1].v[2] + v.v[3] * A.m[1].v[3],
-                    v.v[0] * A.m[2].v[0] + v.v[1] * A.m[2].v[1] + v.v[2] * A.m[2].v[2] + v.v[3] * A.m[2].v[3],
+                    @reduce(.Add, v.v * A.m[0].v),
+                    @reduce(.Add, v.v * A.m[1].v),
+                    @reduce(.Add, v.v * A.m[2].v),
                 },
             };
         }
@@ -1191,10 +1191,10 @@ pub fn Vector4(comptime T: type) type {
         pub inline fn mulMatrix4x4(v: *const Vector4(T), A: *const Matrix4x4(T)) Vector4(T) {
             return Vector4(T){
                 .v = @Vector(4, T){
-                    v.v[0] * A.m[0].v[0] + v.v[1] * A.m[0].v[1] + v.v[2] * A.m[0].v[2] + v.v[3] * A.m[0].v[3],
-                    v.v[0] * A.m[1].v[0] + v.v[1] * A.m[1].v[1] + v.v[2] * A.m[1].v[2] + v.v[3] * A.m[1].v[3],
-                    v.v[0] * A.m[2].v[0] + v.v[1] * A.m[2].v[1] + v.v[2] * A.m[2].v[2] + v.v[3] * A.m[2].v[3],
-                    v.v[0] * A.m[3].v[0] + v.v[1] * A.m[3].v[1] + v.v[2] * A.m[3].v[2] + v.v[3] * A.m[3].v[3],
+                    @reduce(.Add, v.v * A.m[0].v),
+                    @reduce(.Add, v.v * A.m[1].v),
+                    @reduce(.Add, v.v * A.m[2].v),
+                    @reduce(.Add, v.v * A.m[3].v),
                 },
             };
         }
@@ -1363,7 +1363,7 @@ pub fn Vector4(comptime T: type) type {
             return u.mul(&splat(v.dot(u) / u.mod2()));
         }
 
-        /// Reflects a vector against a surface normal:
+        /// Reflects a vector against a normal vector:
         ///
         /// :math:`\mathbf{v} - 2 \frac{\mathbf{v} \cdot \mathbf{n}}{\lVert \mathbf{n} \rVert_2^2} \mathbf{n}`
         ///
@@ -1377,7 +1377,7 @@ pub fn Vector4(comptime T: type) type {
             return v.sub(&normal.mul(&splat(2 * v.dot(normal) / normal.mod2())));
         }
 
-        /// Refracts a vector against a surface normal:
+        /// Refracts a vector against a normal vector:
         ///
         /// :math:`\eta \mathbf{v} - \left(\eta \mathbf{v} \cdot \mathbf{n} + \sqrt{1 - \eta^2 (1 - (\mathbf{v} \cdot \mathbf{n})^2)}\right) \mathbf{n}`
         ///
