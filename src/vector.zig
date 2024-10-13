@@ -385,6 +385,9 @@ pub fn Vector2(comptime T: type) type {
         ///
         /// :math:`\mathbf{v} - 2 \frac{\mathbf{v} \cdot \mathbf{n}}{\lVert \mathbf{n} \rVert_2^2} \mathbf{n}`
         ///
+        /// The reflection is performed with respect to the line that is
+        /// perpendicular to the normal and passes through the origin.
+        ///
         /// **Parameters**:
         /// - `v`: The vector to reflect.
         /// - `normal`: The normal vector. Must be normalized.
@@ -885,6 +888,9 @@ pub fn Vector3(comptime T: type) type {
         ///
         /// :math:`\mathbf{v} - 2 \frac{\mathbf{v} \cdot \mathbf{n}}{\lVert \mathbf{n} \rVert_2^2} \mathbf{n}`
         ///
+        /// The reflection is performed with respect to the plane that is
+        /// perpendicular to the normal and passes through the origin.
+        ///
         /// **Parameters**:
         /// - `v`: The vector to reflect.
         /// - `normal`: The normal vector. Must be normalized.
@@ -1366,6 +1372,9 @@ pub fn Vector4(comptime T: type) type {
         /// Reflects a vector against a normal vector:
         ///
         /// :math:`\mathbf{v} - 2 \frac{\mathbf{v} \cdot \mathbf{n}}{\lVert \mathbf{n} \rVert_2^2} \mathbf{n}`
+        ///
+        /// The reflection is performed with respect to the hyperplane that is
+        /// perpendicular to the normal and passes through the origin.
         ///
         /// **Parameters**:
         /// - `v`: The vector to reflect.
