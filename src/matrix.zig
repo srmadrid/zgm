@@ -2265,6 +2265,20 @@ pub fn Matrix3x3(comptime T: type) type {
             return Matrix3x3(T).init(1, 0, -A.m[2].v[0], 0, 1, -A.m[2].v[1], 0, 0, 1);
         }
 
+        /// Creates the transformation matrix and applies it to the matrix
+        /// in-place.
+        ///
+        /// **Parameters**:
+        /// - `A`: The matrix to transform.
+        /// - `f`: The transformation matrix generator function.
+        /// - `args`: The function arguments.
+        ///
+        /// **Returns**:
+        /// - The transformed matrix.
+        pub inline fn applyTransform(A: *Matrix3x3(T), f: anytype, args: anytype) void {
+            A.* = @call(.auto, f, args).mulMatrix3x3(A);
+        }
+
         /// Compares two matrices and returns true if they are equal.
         ///
         /// **Parameters**:
@@ -5086,6 +5100,20 @@ pub fn Matrix4x4(comptime T: type) type {
             );
         }
 
+        /// Creates the transformation matrix and applies it to the matrix
+        /// in-place.
+        ///
+        /// **Parameters**:
+        /// - `A`: The matrix to transform.
+        /// - `f`: The transformation matrix generator function.
+        /// - `args`: The function arguments.
+        ///
+        /// **Returns**:
+        /// - The transformed matrix.
+        pub inline fn applyTransform(A: *Matrix4x4(T), f: anytype, args: anytype) void {
+            A.* = @call(.auto, f, args).mulMatrix4x4(A);
+        }
+
         /// Compares two matrices and returns true if they are equal.
         ///
         /// **Parameters**:
@@ -7270,6 +7298,13 @@ test "translate_matrix3x3" {
     R2 = Ainv.mulVector3(&R2);
 
     try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+}
+
+test "applyTransform_matrix3x3" {
+    var A = Matrix3x3(f32).identity;
+    A.applyTransform(Matrix3x3(f32).scale, .{ 2.0, 3.0 });
+
+    try std.testing.expectEqual(true, A.approxEqual(&Matrix3x3(f32).scale(2.0, 3.0), 0.0001));
 }
 
 test "add_matrix3x4" {
@@ -10097,4 +10132,11 @@ test "orthographicRHZO_matrix4x4" {
     R2 = Ainv.mulVector4(&R2);
 
     try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+}
+
+test "applyTransform_matrix4x4" {
+    var A = Matrix4x4(f32).identity;
+    A.applyTransform(Matrix4x4(f32).scale, .{ 2.0, 3.0, 4.0 });
+
+    try std.testing.expectEqual(true, A.approxEqual(&Matrix4x4(f32).scale(2.0, 3.0, 4.0), 0.0001));
 }
