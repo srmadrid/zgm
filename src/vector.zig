@@ -29,6 +29,61 @@ pub fn Vector2(comptime T: type) type {
             };
         }
 
+        /// Initialize a 2D vector from a 3D vector.
+        ///
+        /// **Parameters**:
+        /// - `v`: The 3D vector.
+        ///
+        /// **Returns**:
+        /// - A new 2D vector with the input vector in the first two components.
+        pub inline fn fromVector3(v: *const Vector3(T)) Vector2(T) {
+            return Vector2(T){
+                .v = @Vector(2, T){ v.v[0], v.v[1] },
+            };
+        }
+
+        /// Initialize a 2D vector from a 4D vector.
+        ///
+        /// **Parameters**:
+        /// - `v`: The 4D vector.
+        ///
+        /// **Returns**:
+        /// - A new 2D vector with the first two components of the input vector.
+        pub inline fn fromVector4(v: *const Vector4(T)) Vector2(T) {
+            return Vector2(T){
+                .v = @Vector(2, T){ v.v[0], v.v[1] },
+            };
+        }
+
+        /// Initialize a 3D vector from the first two components of a 2D vector.
+        ///
+        /// **Parameters**:
+        /// - `v`: The 2D vector.
+        /// - `zs`: The z component.
+        ///
+        /// **Returns**:
+        /// - A new 3D vector with the first two components of the input.
+        pub inline fn toVector3(v: *const Vector2(T), zs: T) Vector3(T) {
+            return Vector3(T){
+                .v = @Vector(3, T){ v.v[0], v.v[1], zs },
+            };
+        }
+
+        /// Initialize a 4D vector from the first two components of a 2D vector.
+        ///
+        /// **Parameters**:
+        /// - `v`: The 2D vector.
+        /// - `zs`: The z component.
+        /// - `ws`: The w component.
+        ///
+        /// **Returns**:
+        /// - A new 4D vector with the first two components of the input.
+        pub inline fn toVector4(v: *const Vector3(T), zs: T, ws: T) Vector4(T) {
+            return Vector4(T){
+                .v = @Vector(4, T){ v.v[0], v.v[1], zs, ws },
+            };
+        }
+
         /// Creates a new vector with the given scalar value in all components.
         ///
         /// **Parameters**:
@@ -505,6 +560,62 @@ pub fn Vector3(comptime T: type) type {
         pub inline fn init(xs: T, ys: T, zs: T) Vector3(T) {
             return Vector3(T){
                 .v = @Vector(3, T){ xs, ys, zs },
+            };
+        }
+
+        /// Initialize a 3D vector from a 2D vector.
+        ///
+        /// **Parameters**:
+        /// - `v`: The 2D vector.
+        /// - `zs`: The z component.
+        ///
+        /// **Returns**:
+        /// - A new 3D vector with the input vector in the first two components.
+        pub inline fn fromVector2(v: *const Vector2(T), zs: T) Vector3(T) {
+            return Vector3(T){
+                .v = @Vector(3, T){ v.v[0], v.v[1], zs },
+            };
+        }
+
+        /// Initialize a 3D vector from a 4D vector.
+        ///
+        /// **Parameters**:
+        /// - `v`: The 4D vector.
+        ///
+        /// **Returns**:
+        /// - A new 3D vector with the first three components of the input
+        ///   vector.
+        pub inline fn fromVector4(v: *const Vector3(T)) Vector3(T) {
+            return Vector3(T){
+                .v = @Vector(3, T){ v.v[0], v.v[1], v.v[2] },
+            };
+        }
+
+        /// Initialize a 2D vector from the first two components of a 3D vector.
+        ///
+        /// **Parameters**:
+        /// - `v`: The 3D vector.
+        ///
+        /// **Returns**:
+        /// - A new 2D vector with the first two components of the input.
+        pub inline fn toVector2(v: *const Vector3(T)) Vector2(T) {
+            return Vector2(T){
+                .v = @Vector(2, T){ v.v[0], v.v[1] },
+            };
+        }
+
+        /// Initialize a 4D vector from the first three components of a 3D
+        /// vector.
+        ///
+        /// **Parameters**:
+        /// - `v`: The 3D vector.
+        /// - `ws`: The w component.
+        ///
+        /// **Returns**:
+        /// - A new 4D vector with the first three components of the input.
+        pub inline fn toVector4(v: *const Vector3(T), ws: T) Vector4(T) {
+            return Vector4(T){
+                .v = @Vector(4, T){ v.v[0], v.v[1], v.v[2], ws },
             };
         }
 
@@ -1009,6 +1120,64 @@ pub fn Vector4(comptime T: type) type {
         pub inline fn init(xs: T, ys: T, zs: T, ws: T) Vector4(T) {
             return Vector4(T){
                 .v = @Vector(4, T){ xs, ys, zs, ws },
+            };
+        }
+
+        /// Initialize a 4D vector from a 2D vector.
+        ///
+        /// **Parameters**:
+        /// - `v`: The 2D vector.
+        /// - `zs`: The z component.
+        /// - `ws`: The w component.
+        ///
+        /// **Returns**:
+        /// - A new 4D vector with the input vector in the first two components.
+        pub inline fn fromVector2(v: *const Vector2(T), zs: T, ws: T) Vector4(T) {
+            return Vector4(T){
+                .v = @Vector(4, T){ v.v[0], v.v[1], zs, ws },
+            };
+        }
+
+        /// Initialize a 4D vector from a 3D vector.
+        ///
+        /// **Parameters**:
+        /// - `v`: The 3D vector.
+        /// - `ws`: The w component.
+        ///
+        /// **Returns**:
+        /// - A new 4D vector with the input vector in the first three
+        ///   components.
+        pub inline fn fromVector3(v: *const Vector3(T), ws: T) Vector4(T) {
+            return Vector4(T){
+                .v = @Vector(4, T){ v.v[0], v.v[1], v.v[2], ws },
+            };
+        }
+
+        /// Initialize a 2D vector from the first two components of a 4D
+        /// vector.
+        ///
+        /// **Parameters**:
+        /// - `v`: The 4D vector.
+        ///
+        /// **Returns**:
+        /// - A new 2D vector with the first three components of the input.
+        pub inline fn toVector2(v: *const Vector4(T)) Vector2(T) {
+            return Vector2(T){
+                .v = @Vector(2, T){ v.v[0], v.v[1] },
+            };
+        }
+
+        /// Initialize a 3D vector from the first three components of a 4D
+        /// vector.
+        ///
+        /// **Parameters**:
+        /// - `v`: The 4D vector.
+        ///
+        /// **Returns**:
+        /// - A new 3D vector with the first three components of the input.
+        pub inline fn toVector3(v: *const Vector4(T)) Vector3(T) {
+            return Vector3(T){
+                .v = @Vector(3, T){ v.v[0], v.v[1], v.v[2] },
             };
         }
 

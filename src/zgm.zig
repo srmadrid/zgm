@@ -14,6 +14,8 @@ pub const Matrix4x2 = @import("matrix.zig").Matrix4x2;
 pub const Matrix4x3 = @import("matrix.zig").Matrix4x3;
 pub const Matrix4x4 = @import("matrix.zig").Matrix4x4;
 
+pub const Quaternion = @import("quaternion.zig").Quaternion;
+
 test {
     std.testing.refAllDeclsRecursive(@This());
 }
