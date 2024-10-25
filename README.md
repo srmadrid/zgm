@@ -8,6 +8,7 @@ A Zig library for mathematics for graphics programming.
 - Matrices
   - Column-major
   - Transformations are offered only for homogeneous coordinates, i.e., 3x3 matrices work as 2D transformations and 4x4 matrices work as 3D transformations, and no 2x2 or 3x3 matrices are provided for 2D or 3D transformations, respectively.
+- Quaternions
 
 ## Installation
 

@@ -4670,8 +4670,8 @@ pub fn Matrix4x4(comptime T: type) type {
         /// - The view matrix.
         pub inline fn lookAtLH(eye: *const Vector3(T), center: *const Vector3(T), up: *const Vector3(T)) Matrix4x4(T) {
             const f = Vector3(T).normalize(&Vector3(T).sub(eye, center));
-            const s = Vector3(T).normalize(&Vector3(T).cross(&f, up));
-            const u = Vector3(T).cross(&s, &f);
+            const s = Vector3(T).normalize(&Vector3(T).crossRH(&f, up));
+            const u = Vector3(T).crossRH(&s, &f);
             return Matrix4x4(T).init(
                 s.v[0],
                 s.v[1],
@@ -4704,8 +4704,8 @@ pub fn Matrix4x4(comptime T: type) type {
         /// - The view matrix.
         pub inline fn lookAtRH(eye: *const Vector3(T), center: *const Vector3(T), up: *const Vector3(T)) Matrix4x4(T) {
             const f = Vector3(T).normalize(&Vector3(T).sub(center, eye));
-            const s = Vector3(T).normalize(&Vector3(T).cross(&f, up));
-            const u = Vector3(T).cross(&s, &f);
+            const s = Vector3(T).normalize(&Vector3(T).crossRH(&f, up));
+            const u = Vector3(T).crossRH(&s, &f);
             return Matrix4x4(T).init(
                 s.v[0],
                 s.v[1],
@@ -5148,7 +5148,7 @@ pub fn Matrix4x4(comptime T: type) type {
     };
 }
 
-test "add_matrix2x2" {
+test "Matrix2x2.add" {
     const A = Matrix2x2(f32).init(
         1,
         2,
@@ -5163,7 +5163,7 @@ test "add_matrix2x2" {
     );
     const R = Matrix2x2(f32).add(&A, &B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x2(f32).init(
         6,
         8,
         10,
@@ -5171,7 +5171,7 @@ test "add_matrix2x2" {
     ), 0.0001));
 }
 
-test "addScalar_matrix2x2" {
+test "Matrix2x2.addScalar" {
     const A = Matrix2x2(f32).init(
         1,
         2,
@@ -5180,7 +5180,7 @@ test "addScalar_matrix2x2" {
     );
     const R = Matrix2x2(f32).addScalar(&A, 5);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x2(f32).init(
         6,
         7,
         8,
@@ -5188,7 +5188,7 @@ test "addScalar_matrix2x2" {
     ), 0.0001));
 }
 
-test "sub_matrix2x2" {
+test "Matrix2x2.sub" {
     const A = Matrix2x2(f32).init(
         1,
         2,
@@ -5203,7 +5203,7 @@ test "sub_matrix2x2" {
     );
     const R = A.sub(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x2(f32).init(
         -4,
         -4,
         -4,
@@ -5211,7 +5211,7 @@ test "sub_matrix2x2" {
     ), 0.0001));
 }
 
-test "subScalar_matrix2x2" {
+test "Matrix2x2.subScalar" {
     const A = Matrix2x2(f32).init(
         1,
         2,
@@ -5220,7 +5220,7 @@ test "subScalar_matrix2x2" {
     );
     const R = A.subScalar(5);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x2(f32).init(
         -4,
         -3,
         -2,
@@ -5228,7 +5228,7 @@ test "subScalar_matrix2x2" {
     ), 0.0001));
 }
 
-test "negate_matrix2x2" {
+test "Matrix2x2.negate" {
     const A = Matrix2x2(f32).init(
         1,
         2,
@@ -5237,7 +5237,7 @@ test "negate_matrix2x2" {
     );
     const R = A.negate();
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x2(f32).init(
         -1,
         -2,
         -3,
@@ -5245,7 +5245,7 @@ test "negate_matrix2x2" {
     ), 0.0001));
 }
 
-test "mul_matrix2x2" {
+test "Matrix2x2.mul" {
     const A = Matrix2x2(f32).init(
         1,
         2,
@@ -5260,7 +5260,7 @@ test "mul_matrix2x2" {
     );
     const R = A.mul(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x2(f32).init(
         5,
         12,
         21,
@@ -5268,7 +5268,7 @@ test "mul_matrix2x2" {
     ), 0.0001));
 }
 
-test "mulScalar_matrix2x2" {
+test "Matrix2x2.mulScalar" {
     const A = Matrix2x2(f32).init(
         1,
         2,
@@ -5277,7 +5277,7 @@ test "mulScalar_matrix2x2" {
     );
     const R = A.mulScalar(5);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x2(f32).init(
         5,
         10,
         15,
@@ -5285,7 +5285,7 @@ test "mulScalar_matrix2x2" {
     ), 0.0001));
 }
 
-test "mulVector2_matrix2x2" {
+test "Matrix2x2.mulVector2" {
     const A = Matrix2x2(f32).init(
         1,
         2,
@@ -5295,10 +5295,10 @@ test "mulVector2_matrix2x2" {
     const v = Vector2(f32).init(5, 6);
     const R = A.mulVector2(&v);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Vector2(f32).init(17, 39), 0.0001));
+    try std.testing.expect(R.approxEqual(&Vector2(f32).init(17, 39), 0.0001));
 }
 
-test "mulMatrix2x2_matrix2x2" {
+test "Matrix2x2.mulMatrix2x2" {
     const A = Matrix2x2(f32).init(
         1,
         2,
@@ -5313,7 +5313,7 @@ test "mulMatrix2x2_matrix2x2" {
     );
     const R = A.mulMatrix2x2(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x2(f32).init(
         19,
         22,
         43,
@@ -5321,7 +5321,7 @@ test "mulMatrix2x2_matrix2x2" {
     ), 0.0001));
 }
 
-test "mulMatrix2x3_matrix2x2" {
+test "Matrix2x2.mulMatrix2x3" {
     const A = Matrix2x2(f32).init(
         1,
         2,
@@ -5338,7 +5338,7 @@ test "mulMatrix2x3_matrix2x2" {
     );
     const R = A.mulMatrix2x3(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x3(f32).init(
         21,
         24,
         27,
@@ -5348,7 +5348,7 @@ test "mulMatrix2x3_matrix2x2" {
     ), 0.0001));
 }
 
-test "mulMatrix2x4_matrix2x2" {
+test "Matrix2x2.mulMatrix2x4" {
     const A = Matrix2x2(f32).init(
         1,
         2,
@@ -5367,7 +5367,7 @@ test "mulMatrix2x4_matrix2x2" {
     );
     const R = A.mulMatrix2x4(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x4(f32).init(
         23,
         26,
         29,
@@ -5379,7 +5379,7 @@ test "mulMatrix2x4_matrix2x2" {
     ), 0.0001));
 }
 
-test "div_matrix2x2" {
+test "Matrix2x2.div" {
     const A = Matrix2x2(f32).init(
         1,
         2,
@@ -5394,7 +5394,7 @@ test "div_matrix2x2" {
     );
     const R = A.div(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x2(f32).init(
         0.2,
         0.3333,
         0.4285,
@@ -5402,7 +5402,7 @@ test "div_matrix2x2" {
     ), 0.0001));
 }
 
-test "divScalar_matrix2x2" {
+test "Matrix2x2.divScalar" {
     const A = Matrix2x2(f32).init(
         1,
         2,
@@ -5411,7 +5411,7 @@ test "divScalar_matrix2x2" {
     );
     const R = A.divScalar(5);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x2(f32).init(
         0.2,
         0.4,
         0.6,
@@ -5419,7 +5419,7 @@ test "divScalar_matrix2x2" {
     ), 0.0001));
 }
 
-test "transpose_matrix2x2" {
+test "Matrix2x2.transpose" {
     const A = Matrix2x2(f32).init(
         1,
         2,
@@ -5428,7 +5428,7 @@ test "transpose_matrix2x2" {
     );
     const R = A.transpose();
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x2(f32).init(
         1,
         3,
         2,
@@ -5436,7 +5436,7 @@ test "transpose_matrix2x2" {
     ), 0.0001));
 }
 
-test "deteterminant_matrix2x2" {
+test "Matrix2x2.deteterminant" {
     const A = Matrix2x2(f32).init(
         1,
         2,
@@ -5448,7 +5448,7 @@ test "deteterminant_matrix2x2" {
     try std.testing.expectApproxEqRel(-2, R, 0.0001);
 }
 
-test "inverse_matrix2x2" {
+test "Matrix2x2.inverse" {
     const A = Matrix2x2(f32).init(
         1,
         2,
@@ -5457,7 +5457,7 @@ test "inverse_matrix2x2" {
     );
     const R = try A.inverse();
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x2(f32).init(
         -2,
         1,
         1.5,
@@ -5465,7 +5465,7 @@ test "inverse_matrix2x2" {
     ), 0.0001));
 }
 
-test "trace_matrix2x2" {
+test "Matrix2x2.trace" {
     const A = Matrix2x2(f32).init(
         1,
         2,
@@ -5477,7 +5477,7 @@ test "trace_matrix2x2" {
     try std.testing.expectApproxEqRel(5, R, 0.0001);
 }
 
-test "add_matrix2x3" {
+test "Matrix2x3.add" {
     const A = Matrix2x3(f32).init(
         1,
         2,
@@ -5496,7 +5496,7 @@ test "add_matrix2x3" {
     );
     const R = A.add(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x3(f32).init(
         8,
         10,
         12,
@@ -5506,7 +5506,7 @@ test "add_matrix2x3" {
     ), 0.0001));
 }
 
-test "addScalar_matrix2x3" {
+test "Matrix2x3.addScalar" {
     const A = Matrix2x3(f32).init(
         1,
         2,
@@ -5517,7 +5517,7 @@ test "addScalar_matrix2x3" {
     );
     const R = A.addScalar(7);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x3(f32).init(
         8,
         9,
         10,
@@ -5527,7 +5527,7 @@ test "addScalar_matrix2x3" {
     ), 0.0001));
 }
 
-test "sub_matrix2x3" {
+test "Matrix2x3.sub" {
     const A = Matrix2x3(f32).init(
         1,
         2,
@@ -5546,7 +5546,7 @@ test "sub_matrix2x3" {
     );
     const R = A.sub(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x3(f32).init(
         -6,
         -6,
         -6,
@@ -5556,7 +5556,7 @@ test "sub_matrix2x3" {
     ), 0.0001));
 }
 
-test "subScalar_matrix2x3" {
+test "Matrix2x3.subScalar" {
     const A = Matrix2x3(f32).init(
         1,
         2,
@@ -5567,7 +5567,7 @@ test "subScalar_matrix2x3" {
     );
     const R = A.subScalar(7);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x3(f32).init(
         -6,
         -5,
         -4,
@@ -5577,7 +5577,7 @@ test "subScalar_matrix2x3" {
     ), 0.0001));
 }
 
-test "negate_matrix2x3" {
+test "Matrix2x3.negate" {
     const A = Matrix2x3(f32).init(
         1,
         2,
@@ -5588,7 +5588,7 @@ test "negate_matrix2x3" {
     );
     const R = A.negate();
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x3(f32).init(
         -1,
         -2,
         -3,
@@ -5598,7 +5598,7 @@ test "negate_matrix2x3" {
     ), 0.0001));
 }
 
-test "mul_matrix2x3" {
+test "Matrix2x3.mul" {
     const A = Matrix2x3(f32).init(
         1,
         2,
@@ -5617,7 +5617,7 @@ test "mul_matrix2x3" {
     );
     const R = A.mul(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x3(f32).init(
         7,
         16,
         27,
@@ -5627,7 +5627,7 @@ test "mul_matrix2x3" {
     ), 0.0001));
 }
 
-test "mulScalar_matrix2x3" {
+test "Matrix2x3.mulScalar" {
     const A = Matrix2x3(f32).init(
         1,
         2,
@@ -5638,7 +5638,7 @@ test "mulScalar_matrix2x3" {
     );
     const R = A.mulScalar(7);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x3(f32).init(
         7,
         14,
         21,
@@ -5648,7 +5648,7 @@ test "mulScalar_matrix2x3" {
     ), 0.0001));
 }
 
-test "mulVector3_matrix2x3" {
+test "Matrix2x3.mulVector3" {
     const A = Matrix2x3(f32).init(
         1,
         2,
@@ -5660,10 +5660,10 @@ test "mulVector3_matrix2x3" {
     const v = Vector3(f32).init(7, 8, 9);
     const R = A.mulVector3(&v);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Vector2(f32).init(50, 122), 0.0001));
+    try std.testing.expect(R.approxEqual(&Vector2(f32).init(50, 122), 0.0001));
 }
 
-test "mulMatrix3x2_matrix2x3" {
+test "Matrix2x3.mulMatrix3x2" {
     const A = Matrix2x3(f32).init(
         1,
         2,
@@ -5682,7 +5682,7 @@ test "mulMatrix3x2_matrix2x3" {
     );
     const R = A.mulMatrix3x2(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x2(f32).init(
         58,
         64,
         139,
@@ -5690,7 +5690,7 @@ test "mulMatrix3x2_matrix2x3" {
     ), 0.0001));
 }
 
-test "mulMatrix3x3_matrix2x3" {
+test "Matrix2x3.mulMatrix3x3" {
     const A = Matrix2x3(f32).init(
         1,
         2,
@@ -5712,7 +5712,7 @@ test "mulMatrix3x3_matrix2x3" {
     );
     const R = A.mulMatrix3x3(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x3(f32).init(
         66,
         72,
         78,
@@ -5722,7 +5722,7 @@ test "mulMatrix3x3_matrix2x3" {
     ), 0.0001));
 }
 
-test "mulMatrix3x4_matrix2x3" {
+test "Matrix2x3.mulMatrix3x4" {
     const A = Matrix2x3(f32).init(
         1,
         2,
@@ -5747,7 +5747,7 @@ test "mulMatrix3x4_matrix2x3" {
     );
     const R = A.mulMatrix3x4(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x4(f32).init(
         74,
         80,
         86,
@@ -5759,7 +5759,7 @@ test "mulMatrix3x4_matrix2x3" {
     ), 0.0001));
 }
 
-test "div_matrix2x3" {
+test "Matrix2x3.div" {
     const A = Matrix2x3(f32).init(
         1,
         2,
@@ -5778,7 +5778,7 @@ test "div_matrix2x3" {
     );
     const R = A.div(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x3(f32).init(
         0.1428,
         0.25,
         0.3333,
@@ -5788,7 +5788,7 @@ test "div_matrix2x3" {
     ), 0.0001));
 }
 
-test "divScalar_matrix2x3" {
+test "Matrix2x3.divScalar" {
     const A = Matrix2x3(f32).init(
         1,
         2,
@@ -5799,7 +5799,7 @@ test "divScalar_matrix2x3" {
     );
     const R = A.divScalar(7);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x3(f32).init(
         0.1428,
         0.2857,
         0.4285,
@@ -5809,7 +5809,7 @@ test "divScalar_matrix2x3" {
     ), 0.0001));
 }
 
-test "transpose_matrix2x3" {
+test "Matrix2x3.transpose" {
     const A = Matrix2x3(f32).init(
         1,
         2,
@@ -5820,7 +5820,7 @@ test "transpose_matrix2x3" {
     );
     const R = A.transpose();
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x2(f32).init(
         1,
         4,
         2,
@@ -5830,7 +5830,7 @@ test "transpose_matrix2x3" {
     ), 0.0001));
 }
 
-test "add_matrix2x4" {
+test "Matrix2x4.add" {
     const A = Matrix2x4(f32).init(
         1,
         2,
@@ -5853,7 +5853,7 @@ test "add_matrix2x4" {
     );
     const R = A.add(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x4(f32).init(
         10,
         12,
         14,
@@ -5865,7 +5865,7 @@ test "add_matrix2x4" {
     ), 0.0001));
 }
 
-test "addScalar_matrix2x4" {
+test "Matrix2x4.addScalar" {
     const A = Matrix2x4(f32).init(
         1,
         2,
@@ -5878,7 +5878,7 @@ test "addScalar_matrix2x4" {
     );
     const R = A.addScalar(9);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x4(f32).init(
         10,
         11,
         12,
@@ -5890,7 +5890,7 @@ test "addScalar_matrix2x4" {
     ), 0.0001));
 }
 
-test "sub_matrix2x4" {
+test "Matrix2x4.sub" {
     const A = Matrix2x4(f32).init(
         1,
         2,
@@ -5913,7 +5913,7 @@ test "sub_matrix2x4" {
     );
     const R = A.sub(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x4(f32).init(
         -8,
         -8,
         -8,
@@ -5925,7 +5925,7 @@ test "sub_matrix2x4" {
     ), 0.0001));
 }
 
-test "subScalar_matrix2x4" {
+test "Matrix2x4.subScalar" {
     const A = Matrix2x4(f32).init(
         1,
         2,
@@ -5938,7 +5938,7 @@ test "subScalar_matrix2x4" {
     );
     const R = A.subScalar(9);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x4(f32).init(
         -8,
         -7,
         -6,
@@ -5950,7 +5950,7 @@ test "subScalar_matrix2x4" {
     ), 0.0001));
 }
 
-test "negate_matrix2x4" {
+test "Matrix2x4.negate" {
     const A = Matrix2x4(f32).init(
         1,
         2,
@@ -5963,7 +5963,7 @@ test "negate_matrix2x4" {
     );
     const R = A.negate();
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x4(f32).init(
         -1,
         -2,
         -3,
@@ -5975,7 +5975,7 @@ test "negate_matrix2x4" {
     ), 0.0001));
 }
 
-test "mul_matrix2x4" {
+test "Matrix2x4.mul" {
     const A = Matrix2x4(f32).init(
         1,
         2,
@@ -5998,7 +5998,7 @@ test "mul_matrix2x4" {
     );
     const R = A.mul(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x4(f32).init(
         9,
         20,
         33,
@@ -6010,7 +6010,7 @@ test "mul_matrix2x4" {
     ), 0.0001));
 }
 
-test "mulScalar_matrix2x4" {
+test "Matrix2x4.mulScalar" {
     const A = Matrix2x4(f32).init(
         1,
         2,
@@ -6023,7 +6023,7 @@ test "mulScalar_matrix2x4" {
     );
     const R = A.mulScalar(9);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x4(f32).init(
         9,
         18,
         27,
@@ -6035,7 +6035,7 @@ test "mulScalar_matrix2x4" {
     ), 0.0001));
 }
 
-test "mulVector4_matrix2x4" {
+test "Matrix2x4.mulVector4" {
     const A = Matrix2x4(f32).init(
         1,
         2,
@@ -6049,10 +6049,10 @@ test "mulVector4_matrix2x4" {
     const v = Vector4(f32).init(9, 10, 11, 12);
     const R = A.mulVector4(&v);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Vector2(f32).init(110, 278), 0.0001));
+    try std.testing.expect(R.approxEqual(&Vector2(f32).init(110, 278), 0.0001));
 }
 
-test "mulMatrix4x2_matrix2x4" {
+test "Matrix2x4.mulMatrix4x2" {
     const A = Matrix2x4(f32).init(
         1,
         2,
@@ -6075,7 +6075,7 @@ test "mulMatrix4x2_matrix2x4" {
     );
     const R = A.mulMatrix4x2(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x2(f32).init(
         130,
         140,
         322,
@@ -6083,7 +6083,7 @@ test "mulMatrix4x2_matrix2x4" {
     ), 0.0001));
 }
 
-test "mulMatrix4x3_matrix2x4" {
+test "Matrix2x4.mulMatrix4x3" {
     const A = Matrix2x4(f32).init(
         1,
         2,
@@ -6110,7 +6110,7 @@ test "mulMatrix4x3_matrix2x4" {
     );
     const R = A.mulMatrix4x3(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x3(f32).init(
         150,
         160,
         170,
@@ -6120,7 +6120,7 @@ test "mulMatrix4x3_matrix2x4" {
     ), 0.0001));
 }
 
-test "mulMatrix4x4_matrix2x4" {
+test "Matrix2x4.mulMatrix4x4" {
     const A = Matrix2x4(f32).init(
         1,
         2,
@@ -6151,7 +6151,7 @@ test "mulMatrix4x4_matrix2x4" {
     );
     const R = A.mulMatrix4x4(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x4(f32).init(
         170,
         180,
         190,
@@ -6163,7 +6163,7 @@ test "mulMatrix4x4_matrix2x4" {
     ), 0.0001));
 }
 
-test "div_matrix2x4" {
+test "Matrix2x4.div" {
     const A = Matrix2x4(f32).init(
         1,
         2,
@@ -6186,7 +6186,7 @@ test "div_matrix2x4" {
     );
     const R = A.div(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x4(f32).init(
         0.1111,
         0.2,
         0.2727,
@@ -6198,7 +6198,7 @@ test "div_matrix2x4" {
     ), 0.0001));
 }
 
-test "divScalar_matrix2x4" {
+test "Matrix2x4.divScalar" {
     const A = Matrix2x4(f32).init(
         1,
         2,
@@ -6211,7 +6211,7 @@ test "divScalar_matrix2x4" {
     );
     const R = A.divScalar(9);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x4(f32).init(
         0.1111,
         0.2222,
         0.3333,
@@ -6223,7 +6223,7 @@ test "divScalar_matrix2x4" {
     ), 0.0001));
 }
 
-test "transpose_matrix2x4" {
+test "Matrix2x4.transpose" {
     const A = Matrix2x4(f32).init(
         1,
         2,
@@ -6236,7 +6236,7 @@ test "transpose_matrix2x4" {
     );
     const R = A.transpose();
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x2(f32).init(
         1,
         5,
         2,
@@ -6248,7 +6248,7 @@ test "transpose_matrix2x4" {
     ), 0.0001));
 }
 
-test "add_matrix3x2" {
+test "Matrix3x2.add" {
     const A = Matrix3x2(f32).init(
         1,
         2,
@@ -6267,7 +6267,7 @@ test "add_matrix3x2" {
     );
     const R = A.add(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x2(f32).init(
         8,
         10,
         12,
@@ -6277,7 +6277,7 @@ test "add_matrix3x2" {
     ), 0.0001));
 }
 
-test "addScalar_matrix3x2" {
+test "Matrix3x2.addScalar" {
     const A = Matrix3x2(f32).init(
         1,
         2,
@@ -6288,7 +6288,7 @@ test "addScalar_matrix3x2" {
     );
     const R = A.addScalar(7);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x2(f32).init(
         8,
         9,
         10,
@@ -6298,7 +6298,7 @@ test "addScalar_matrix3x2" {
     ), 0.0001));
 }
 
-test "sub_matrix3x2" {
+test "Matrix3x2.sub" {
     const A = Matrix3x2(f32).init(
         1,
         2,
@@ -6317,7 +6317,7 @@ test "sub_matrix3x2" {
     );
     const R = A.sub(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x2(f32).init(
         -6,
         -6,
         -6,
@@ -6327,7 +6327,7 @@ test "sub_matrix3x2" {
     ), 0.0001));
 }
 
-test "subScalar_matrix3x2" {
+test "Matrix3x2.subScalar" {
     const A = Matrix3x2(f32).init(
         1,
         2,
@@ -6338,7 +6338,7 @@ test "subScalar_matrix3x2" {
     );
     const R = A.subScalar(7);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x2(f32).init(
         -6,
         -5,
         -4,
@@ -6348,7 +6348,7 @@ test "subScalar_matrix3x2" {
     ), 0.0001));
 }
 
-test "negate_matrix3x2" {
+test "Matrix3x2.negate" {
     const A = Matrix3x2(f32).init(
         1,
         2,
@@ -6359,7 +6359,7 @@ test "negate_matrix3x2" {
     );
     const R = A.negate();
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x2(f32).init(
         -1,
         -2,
         -3,
@@ -6369,7 +6369,7 @@ test "negate_matrix3x2" {
     ), 0.0001));
 }
 
-test "mul_matrix3x2" {
+test "Matrix3x2.mul" {
     const A = Matrix3x2(f32).init(
         1,
         2,
@@ -6388,7 +6388,7 @@ test "mul_matrix3x2" {
     );
     const R = A.mul(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x2(f32).init(
         7,
         16,
         27,
@@ -6398,7 +6398,7 @@ test "mul_matrix3x2" {
     ), 0.0001));
 }
 
-test "mulScalar_matrix3x2" {
+test "Matrix3x2.mulScalar" {
     const A = Matrix3x2(f32).init(
         1,
         2,
@@ -6409,7 +6409,7 @@ test "mulScalar_matrix3x2" {
     );
     const R = A.mulScalar(7);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x2(f32).init(
         7,
         14,
         21,
@@ -6419,7 +6419,7 @@ test "mulScalar_matrix3x2" {
     ), 0.0001));
 }
 
-test "mulVector2_matrix3x2" {
+test "Matrix3x2.mulVector2" {
     const A = Matrix3x2(f32).init(
         1,
         2,
@@ -6431,10 +6431,10 @@ test "mulVector2_matrix3x2" {
     const v = Vector2(f32).init(7, 8);
     const R = A.mulVector2(&v);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Vector3(f32).init(23, 53, 83), 0.0001));
+    try std.testing.expect(R.approxEqual(&Vector3(f32).init(23, 53, 83), 0.0001));
 }
 
-test "mulMatrix2x2_matrix3x2" {
+test "Matrix3x2.mulMatrix2x2" {
     const A = Matrix3x2(f32).init(
         1,
         2,
@@ -6451,7 +6451,7 @@ test "mulMatrix2x2_matrix3x2" {
     );
     const R = A.mulMatrix2x2(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x2(f32).init(
         25,
         28,
         57,
@@ -6461,7 +6461,7 @@ test "mulMatrix2x2_matrix3x2" {
     ), 0.0001));
 }
 
-test "mulMatrix2x3_matrix3x2" {
+test "Matrix3x2.mulMatrix2x3" {
     const A = Matrix3x2(f32).init(
         1,
         2,
@@ -6480,7 +6480,7 @@ test "mulMatrix2x3_matrix3x2" {
     );
     const R = A.mulMatrix2x3(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x3(f32).init(
         27,
         30,
         33,
@@ -6493,7 +6493,7 @@ test "mulMatrix2x3_matrix3x2" {
     ), 0.0001));
 }
 
-test "mulMatrix2x4_matrix3x2" {
+test "Matrix3x2.mulMatrix2x4" {
     const A = Matrix3x2(f32).init(
         1,
         2,
@@ -6514,7 +6514,7 @@ test "mulMatrix2x4_matrix3x2" {
     );
     const R = A.mulMatrix2x4(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x4(f32).init(
         29,
         32,
         35,
@@ -6530,7 +6530,7 @@ test "mulMatrix2x4_matrix3x2" {
     ), 0.0001));
 }
 
-test "div_matrix3x2" {
+test "Matrix3x2.div" {
     const A = Matrix3x2(f32).init(
         1,
         2,
@@ -6549,7 +6549,7 @@ test "div_matrix3x2" {
     );
     const R = A.div(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x2(f32).init(
         0.1428,
         0.25,
         0.3333,
@@ -6559,7 +6559,7 @@ test "div_matrix3x2" {
     ), 0.0001));
 }
 
-test "divScalar_matrix3x2" {
+test "Matrix3x2.divScalar" {
     const A = Matrix3x2(f32).init(
         1,
         2,
@@ -6570,7 +6570,7 @@ test "divScalar_matrix3x2" {
     );
     const R = A.divScalar(7);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x2(f32).init(
         0.1428,
         0.2857,
         0.4285,
@@ -6580,7 +6580,7 @@ test "divScalar_matrix3x2" {
     ), 0.0001));
 }
 
-test "transpose_matrix3x2" {
+test "Matrix3x2.transpose" {
     const A = Matrix3x2(f32).init(
         1,
         2,
@@ -6591,7 +6591,7 @@ test "transpose_matrix3x2" {
     );
     const R = A.transpose();
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x3(f32).init(
         1,
         3,
         5,
@@ -6601,7 +6601,7 @@ test "transpose_matrix3x2" {
     ), 0.0001));
 }
 
-test "add_matrix3x3" {
+test "Matrix3x3.add" {
     const A = Matrix3x3(f32).init(
         1,
         2,
@@ -6626,7 +6626,7 @@ test "add_matrix3x3" {
     );
     const R = A.add(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x3(f32).init(
         11,
         13,
         15,
@@ -6639,7 +6639,7 @@ test "add_matrix3x3" {
     ), 0.0001));
 }
 
-test "addScalar_matrix3x3" {
+test "Matrix3x3.addScalar" {
     const A = Matrix3x3(f32).init(
         1,
         2,
@@ -6653,7 +6653,7 @@ test "addScalar_matrix3x3" {
     );
     const R = A.addScalar(10);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x3(f32).init(
         11,
         12,
         13,
@@ -6666,7 +6666,7 @@ test "addScalar_matrix3x3" {
     ), 0.0001));
 }
 
-test "sub_matrix3x3" {
+test "Matrix3x3.sub" {
     const A = Matrix3x3(f32).init(
         1,
         2,
@@ -6691,7 +6691,7 @@ test "sub_matrix3x3" {
     );
     const R = A.sub(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x3(f32).init(
         -9,
         -9,
         -9,
@@ -6704,7 +6704,7 @@ test "sub_matrix3x3" {
     ), 0.0001));
 }
 
-test "subScalar_matrix3x3" {
+test "Matrix3x3.subScalar" {
     const A = Matrix3x3(f32).init(
         1,
         2,
@@ -6718,7 +6718,7 @@ test "subScalar_matrix3x3" {
     );
     const R = A.subScalar(10);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x3(f32).init(
         -9,
         -8,
         -7,
@@ -6731,7 +6731,7 @@ test "subScalar_matrix3x3" {
     ), 0.0001));
 }
 
-test "negate_matrix3x3" {
+test "Matrix3x3.negate" {
     const A = Matrix3x3(f32).init(
         1,
         2,
@@ -6745,7 +6745,7 @@ test "negate_matrix3x3" {
     );
     const R = A.negate();
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x3(f32).init(
         -1,
         -2,
         -3,
@@ -6758,7 +6758,7 @@ test "negate_matrix3x3" {
     ), 0.0001));
 }
 
-test "mul_matrix3x3" {
+test "Matrix3x3.mul" {
     const A = Matrix3x3(f32).init(
         1,
         2,
@@ -6783,7 +6783,7 @@ test "mul_matrix3x3" {
     );
     const R = A.mul(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x3(f32).init(
         10,
         22,
         36,
@@ -6796,7 +6796,7 @@ test "mul_matrix3x3" {
     ), 0.0001));
 }
 
-test "mulScalar_matrix3x3" {
+test "Matrix3x3.mulScalar" {
     const A = Matrix3x3(f32).init(
         1,
         2,
@@ -6810,7 +6810,7 @@ test "mulScalar_matrix3x3" {
     );
     const R = A.mulScalar(10);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x3(f32).init(
         10,
         20,
         30,
@@ -6823,7 +6823,7 @@ test "mulScalar_matrix3x3" {
     ), 0.0001));
 }
 
-test "mulVector2_matrix3x3" {
+test "Matrix3x3.mulVector2" {
     const A = Matrix3x3(f32).init(
         1,
         2,
@@ -6838,10 +6838,10 @@ test "mulVector2_matrix3x3" {
     const v = Vector2(f32).init(10, 11);
     const R = A.mulVector2(&v);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Vector2(f32).init(35, 101), 0.0001));
+    try std.testing.expect(R.approxEqual(&Vector2(f32).init(35, 101), 0.0001));
 }
 
-test "mulVector3_matrix3x3" {
+test "Matrix3x3.mulVector3" {
     const A = Matrix3x3(f32).init(
         1,
         2,
@@ -6856,10 +6856,10 @@ test "mulVector3_matrix3x3" {
     const v = Vector3(f32).init(10, 11, 12);
     const R = A.mulVector3(&v);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Vector3(f32).init(68, 167, 266), 0.0001));
+    try std.testing.expect(R.approxEqual(&Vector3(f32).init(68, 167, 266), 0.0001));
 }
 
-test "mulMatrix3x2_matrix3x3" {
+test "Matrix3x3.mulMatrix3x2" {
     const A = Matrix3x3(f32).init(
         1,
         2,
@@ -6881,7 +6881,7 @@ test "mulMatrix3x2_matrix3x3" {
     );
     const R = A.mulMatrix3x2(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x2(f32).init(
         76,
         82,
         184,
@@ -6891,7 +6891,7 @@ test "mulMatrix3x2_matrix3x3" {
     ), 0.0001));
 }
 
-test "mulMatrix3x3_matrix3x3" {
+test "Matrix3x3.mulMatrix3x3" {
     const A = Matrix3x3(f32).init(
         1,
         2,
@@ -6916,7 +6916,7 @@ test "mulMatrix3x3_matrix3x3" {
     );
     const R = A.mulMatrix3x3(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x3(f32).init(
         84,
         90,
         96,
@@ -6929,7 +6929,7 @@ test "mulMatrix3x3_matrix3x3" {
     ), 0.0001));
 }
 
-test "mulMatrix3x4_matrix3x3" {
+test "Matrix3x3.mulMatrix3x4" {
     const A = Matrix3x3(f32).init(
         1,
         2,
@@ -6957,7 +6957,7 @@ test "mulMatrix3x4_matrix3x3" {
     );
     const R = A.mulMatrix3x4(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x4(f32).init(
         92,
         98,
         104,
@@ -6973,7 +6973,7 @@ test "mulMatrix3x4_matrix3x3" {
     ), 0.0001));
 }
 
-test "div_matrix3x3" {
+test "Matrix3x3.div" {
     const A = Matrix3x3(f32).init(
         1,
         2,
@@ -6998,7 +6998,7 @@ test "div_matrix3x3" {
     );
     const R = A.div(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x3(f32).init(
         0.1,
         0.1818,
         0.25,
@@ -7011,7 +7011,7 @@ test "div_matrix3x3" {
     ), 0.0001));
 }
 
-test "divScalar_matrix3x3" {
+test "Matrix3x3.divScalar" {
     const A = Matrix3x3(f32).init(
         1,
         2,
@@ -7025,7 +7025,7 @@ test "divScalar_matrix3x3" {
     );
     const R = A.divScalar(10);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x3(f32).init(
         0.1,
         0.2,
         0.3,
@@ -7038,7 +7038,7 @@ test "divScalar_matrix3x3" {
     ), 0.0001));
 }
 
-test "transpose_matrix3x3" {
+test "Matrix3x3.transpose" {
     const A = Matrix3x3(f32).init(
         1,
         2,
@@ -7052,7 +7052,7 @@ test "transpose_matrix3x3" {
     );
     const R = A.transpose();
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x3(f32).init(
         1,
         4,
         7,
@@ -7065,7 +7065,7 @@ test "transpose_matrix3x3" {
     ), 0.0001));
 }
 
-test "deteterminant_matrix3x3" {
+test "Matrix3x3.deteterminant" {
     const A = Matrix3x3(f32).init(
         1,
         2,
@@ -7082,7 +7082,7 @@ test "deteterminant_matrix3x3" {
     try std.testing.expectApproxEqRel(0, R, 0.0001);
 }
 
-test "inverse_matrix3x3" {
+test "Matrix3x3.inverse" {
     const A = Matrix3x3(f32).init(
         1,
         2,
@@ -7096,7 +7096,7 @@ test "inverse_matrix3x3" {
     );
     const R = try A.inverse();
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x3(f32).init(
         -24,
         18,
         5,
@@ -7109,7 +7109,7 @@ test "inverse_matrix3x3" {
     ), 0.0001));
 }
 
-test "trace_matrix3x3" {
+test "Matrix3x3.trace" {
     const A = Matrix3x3(f32).init(
         1,
         2,
@@ -7126,188 +7126,188 @@ test "trace_matrix3x3" {
     try std.testing.expectApproxEqRel(15, R, 0.0001);
 }
 
-test "scale_matrix3x3" {
+test "Matrix3x3.scale" {
     const v = Vector2(f32).init(1, 2);
     const w = Vector3(f32).init(3, 4, 1);
     const A = Matrix3x3(f32).scale(6, 7);
     const Ainv = A.scaleInverse();
     var R1 = A.mulVector2(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector2(f32).init(6, 14), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector2(f32).init(6, 14), 0.0001));
 
     R1 = Ainv.mulVector2(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector3(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector3(f32).init(18, 28, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector3(f32).init(18, 28, 1), 0.0001));
 
     R2 = Ainv.mulVector3(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "shearX_matrix3x3" {
+test "Matrix3x3.shearX" {
     const v = Vector2(f32).init(1, 2);
     const w = Vector3(f32).init(3, 4, 1);
     const A = Matrix3x3(f32).shearX(5);
     const Ainv = A.shearInverse();
     var R1 = A.mulVector2(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector2(f32).init(11, 2), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector2(f32).init(11, 2), 0.0001));
 
     R1 = Ainv.mulVector2(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector3(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector3(f32).init(23, 4, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector3(f32).init(23, 4, 1), 0.0001));
 
     R2 = Ainv.mulVector3(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "shearY_matrix3x3" {
+test "Matrix3x3.shearY" {
     const v = Vector2(f32).init(1, 2);
     const w = Vector3(f32).init(3, 4, 1);
     const A = Matrix3x3(f32).shearY(5);
     const Ainv = A.shearInverse();
     var R1 = A.mulVector2(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector2(f32).init(1, 7), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector2(f32).init(1, 7), 0.0001));
 
     R1 = Ainv.mulVector2(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector3(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector3(f32).init(3, 19, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector3(f32).init(3, 19, 1), 0.0001));
 
     R2 = Ainv.mulVector3(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "rotateLH_matrix3x3" {
+test "Matrix3x3.rotateLH" {
     const v = Vector2(f32).init(1, 2);
     const w = Vector3(f32).init(3, 4, 1);
     const A = Matrix3x3(f32).rotateLH(3.14159 / 2.0);
     const Ainv = A.rotateInverse();
     var R1 = A.mulVector2(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector2(f32).init(-2, 1), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector2(f32).init(-2, 1), 0.0001));
 
     R1 = Ainv.mulVector2(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector3(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector3(f32).init(-4, 3, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector3(f32).init(-4, 3, 1), 0.0001));
 
     R2 = Ainv.mulVector3(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "rotateRH_matrix3x3" {
+test "Matrix3x3.rotateRH" {
     const v = Vector2(f32).init(1, 2);
     const w = Vector3(f32).init(3, 4, 1);
     const A = Matrix3x3(f32).rotateRH(3.14159 / 2.0);
     const Ainv = A.rotateInverse();
     var R1 = A.mulVector2(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector2(f32).init(2, -1), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector2(f32).init(2, -1), 0.0001));
 
     R1 = Ainv.mulVector2(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector3(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector3(f32).init(4, -3, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector3(f32).init(4, -3, 1), 0.0001));
 
     R2 = Ainv.mulVector3(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "reflect_matrix3x3" {
+test "Matrix3x3.reflect" {
     const v = Vector2(f32).init(1, 2);
     const w = Vector3(f32).init(3, 4, 1);
     const A = Matrix3x3(f32).reflect(&Vector2(f32).init(1, 0).normalize());
     var R1 = A.mulVector2(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector2(f32).init(-1, 2), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector2(f32).init(-1, 2), 0.0001));
 
     R1 = A.mulVector2(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector3(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector3(f32).init(-3, 4, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector3(f32).init(-3, 4, 1), 0.0001));
 
     R2 = A.mulVector3(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "reflectPoint_matrix3x3" {
+test "Matrix3x3.reflectPoint" {
     const v = Vector2(f32).init(1, 2);
     const w = Vector3(f32).init(3, 4, 1);
     const A = Matrix3x3(f32).reflectPoint(&Vector2(f32).init(0, 1).normalize(), &Vector2(f32).init(1, 1));
     var R1 = A.mulVector2(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector2(f32).init(1, 0), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector2(f32).init(1, 0), 0.0001));
 
     R1 = A.mulVector2(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector3(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector3(f32).init(3, -2, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector3(f32).init(3, -2, 1), 0.0001));
 
     R2 = A.mulVector3(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "translate_matrix3x3" {
+test "Matrix3x3.translate" {
     const v = Vector2(f32).init(1, 2);
     const w = Vector3(f32).init(3, 4, 1);
     const A = Matrix3x3(f32).translate(5, 6);
     const Ainv = A.translateInverse();
     var R1 = A.mulVector2(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector2(f32).init(6, 8), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector2(f32).init(6, 8), 0.0001));
 
     R1 = Ainv.mulVector2(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector3(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector3(f32).init(8, 10, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector3(f32).init(8, 10, 1), 0.0001));
 
     R2 = Ainv.mulVector3(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "applyTransform_matrix3x3" {
+test "Matrix3x3.applyTransform" {
     var A = Matrix3x3(f32).identity;
     A.applyTransform(Matrix3x3(f32).scale, .{ 2.0, 3.0 });
 
-    try std.testing.expectEqual(true, A.approxEqual(&Matrix3x3(f32).scale(2.0, 3.0), 0.0001));
+    try std.testing.expect(A.approxEqual(&Matrix3x3(f32).scale(2.0, 3.0), 0.0001));
 }
 
-test "add_matrix3x4" {
+test "Matrix3x4.add" {
     const A = Matrix3x4(f32).init(
         1,
         2,
@@ -7338,7 +7338,7 @@ test "add_matrix3x4" {
     );
     const R = A.add(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x4(f32).init(
         14,
         16,
         18,
@@ -7354,7 +7354,7 @@ test "add_matrix3x4" {
     ), 0.0001));
 }
 
-test "addScalar_matrix3x4" {
+test "Matrix3x4.addScalar" {
     const A = Matrix3x4(f32).init(
         1,
         2,
@@ -7371,7 +7371,7 @@ test "addScalar_matrix3x4" {
     );
     const R = A.addScalar(13);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x4(f32).init(
         14,
         15,
         16,
@@ -7387,7 +7387,7 @@ test "addScalar_matrix3x4" {
     ), 0.0001));
 }
 
-test "sub_matrix3x4" {
+test "Matrix3x4.sub" {
     const A = Matrix3x4(f32).init(
         1,
         2,
@@ -7418,7 +7418,7 @@ test "sub_matrix3x4" {
     );
     const R = A.sub(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x4(f32).init(
         -12,
         -12,
         -12,
@@ -7434,7 +7434,7 @@ test "sub_matrix3x4" {
     ), 0.0001));
 }
 
-test "subScalar_matrix3x4" {
+test "Matrix3x4.subScalar" {
     const A = Matrix3x4(f32).init(
         1,
         2,
@@ -7451,7 +7451,7 @@ test "subScalar_matrix3x4" {
     );
     const R = A.subScalar(13);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x4(f32).init(
         -12,
         -11,
         -10,
@@ -7467,7 +7467,7 @@ test "subScalar_matrix3x4" {
     ), 0.0001));
 }
 
-test "negate_matrix3x4" {
+test "Matrix3x4.negate" {
     const A = Matrix3x4(f32).init(
         1,
         2,
@@ -7484,7 +7484,7 @@ test "negate_matrix3x4" {
     );
     const R = A.negate();
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x4(f32).init(
         -1,
         -2,
         -3,
@@ -7500,7 +7500,7 @@ test "negate_matrix3x4" {
     ), 0.0001));
 }
 
-test "mul_matrix3x4" {
+test "Matrix3x4.mul" {
     const A = Matrix3x4(f32).init(
         1,
         2,
@@ -7531,7 +7531,7 @@ test "mul_matrix3x4" {
     );
     const R = A.mul(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x4(f32).init(
         13,
         28,
         45,
@@ -7547,7 +7547,7 @@ test "mul_matrix3x4" {
     ), 0.0001));
 }
 
-test "mulScalar_matrix3x4" {
+test "Matrix3x4.mulScalar" {
     const A = Matrix3x4(f32).init(
         1,
         2,
@@ -7564,7 +7564,7 @@ test "mulScalar_matrix3x4" {
     );
     const R = A.mulScalar(13);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x4(f32).init(
         13,
         26,
         39,
@@ -7580,7 +7580,7 @@ test "mulScalar_matrix3x4" {
     ), 0.0001));
 }
 
-test "mulVector4_matrix3x4" {
+test "Matrix3x4.mulVector4" {
     const A = Matrix3x4(f32).init(
         1,
         2,
@@ -7598,10 +7598,10 @@ test "mulVector4_matrix3x4" {
     const v = Vector4(f32).init(13, 14, 15, 16);
     const R = A.mulVector4(&v);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Vector3(f32).init(150, 382, 614), 0.0001));
+    try std.testing.expect(R.approxEqual(&Vector3(f32).init(150, 382, 614), 0.0001));
 }
 
-test "mulMatrix4x2_matrix3x4" {
+test "Matrix3x4.mulMatrix4x2" {
     const A = Matrix3x4(f32).init(
         1,
         2,
@@ -7628,7 +7628,7 @@ test "mulMatrix4x2_matrix3x4" {
     );
     const R = A.mulMatrix4x2(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x2(f32).init(
         170,
         180,
         426,
@@ -7638,7 +7638,7 @@ test "mulMatrix4x2_matrix3x4" {
     ), 0.0001));
 }
 
-test "mulMatrix4x3_matrix3x4" {
+test "Matrix3x4.mulMatrix4x3" {
     const A = Matrix3x4(f32).init(
         1,
         2,
@@ -7669,7 +7669,7 @@ test "mulMatrix4x3_matrix3x4" {
     );
     const R = A.mulMatrix4x3(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x3(f32).init(
         190,
         200,
         210,
@@ -7682,7 +7682,7 @@ test "mulMatrix4x3_matrix3x4" {
     ), 0.0001));
 }
 
-test "mulMatrix4x4_matrix3x4" {
+test "Matrix3x4.mulMatrix4x4" {
     const A = Matrix3x4(f32).init(
         1,
         2,
@@ -7717,7 +7717,7 @@ test "mulMatrix4x4_matrix3x4" {
     );
     const R = A.mulMatrix4x4(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x4(f32).init(
         210,
         220,
         230,
@@ -7733,7 +7733,7 @@ test "mulMatrix4x4_matrix3x4" {
     ), 0.0001));
 }
 
-test "div_matrix3x4" {
+test "Matrix3x4.div" {
     const A = Matrix3x4(f32).init(
         1,
         2,
@@ -7764,7 +7764,7 @@ test "div_matrix3x4" {
     );
     const R = A.div(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x4(f32).init(
         0.0769,
         0.1428,
         0.2,
@@ -7780,7 +7780,7 @@ test "div_matrix3x4" {
     ), 0.0001));
 }
 
-test "divScalar_matrix3x4" {
+test "Matrix3x4.divScalar" {
     const A = Matrix3x4(f32).init(
         1,
         2,
@@ -7797,7 +7797,7 @@ test "divScalar_matrix3x4" {
     );
     const R = A.divScalar(13);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x4(f32).init(
         0.0769,
         0.1538,
         0.2307,
@@ -7813,7 +7813,7 @@ test "divScalar_matrix3x4" {
     ), 0.0001));
 }
 
-test "transpose_matrix3x4" {
+test "Matrix3x4.transpose" {
     const A = Matrix3x4(f32).init(
         1,
         2,
@@ -7830,7 +7830,7 @@ test "transpose_matrix3x4" {
     );
     const R = A.transpose();
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x3(f32).init(
         1,
         5,
         9,
@@ -7846,7 +7846,7 @@ test "transpose_matrix3x4" {
     ), 0.0001));
 }
 
-test "add_matrix4x2" {
+test "Matrix4x2.add" {
     const A = Matrix4x2(f32).init(
         1,
         2,
@@ -7869,7 +7869,7 @@ test "add_matrix4x2" {
     );
     const R = A.add(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x2(f32).init(
         10,
         12,
         14,
@@ -7881,7 +7881,7 @@ test "add_matrix4x2" {
     ), 0.0001));
 }
 
-test "addScalar_matrix4x2" {
+test "Matrix4x2.addScalar" {
     const A = Matrix4x2(f32).init(
         1,
         2,
@@ -7894,7 +7894,7 @@ test "addScalar_matrix4x2" {
     );
     const R = A.addScalar(9);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x2(f32).init(
         10,
         11,
         12,
@@ -7906,7 +7906,7 @@ test "addScalar_matrix4x2" {
     ), 0.0001));
 }
 
-test "sub_matrix4x2" {
+test "Matrix4x2.sub" {
     const A = Matrix4x2(f32).init(
         1,
         2,
@@ -7929,7 +7929,7 @@ test "sub_matrix4x2" {
     );
     const R = A.sub(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x2(f32).init(
         -8,
         -8,
         -8,
@@ -7941,7 +7941,7 @@ test "sub_matrix4x2" {
     ), 0.0001));
 }
 
-test "subScalar_matrix4x2" {
+test "Matrix4x2.subScalar" {
     const A = Matrix4x2(f32).init(
         1,
         2,
@@ -7954,7 +7954,7 @@ test "subScalar_matrix4x2" {
     );
     const R = A.subScalar(9);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x2(f32).init(
         -8,
         -7,
         -6,
@@ -7966,7 +7966,7 @@ test "subScalar_matrix4x2" {
     ), 0.0001));
 }
 
-test "negate_matrix4x2" {
+test "Matrix4x2.negate" {
     const A = Matrix4x2(f32).init(
         1,
         2,
@@ -7979,7 +7979,7 @@ test "negate_matrix4x2" {
     );
     const R = A.negate();
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x2(f32).init(
         -1,
         -2,
         -3,
@@ -7991,7 +7991,7 @@ test "negate_matrix4x2" {
     ), 0.0001));
 }
 
-test "mul_matrix4x2" {
+test "Matrix4x2.mul" {
     const A = Matrix4x2(f32).init(
         1,
         2,
@@ -8014,7 +8014,7 @@ test "mul_matrix4x2" {
     );
     const R = A.mul(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x2(f32).init(
         9,
         20,
         33,
@@ -8026,7 +8026,7 @@ test "mul_matrix4x2" {
     ), 0.0001));
 }
 
-test "mulScalar_matrix4x2" {
+test "Matrix4x2.mulScalar" {
     const A = Matrix4x2(f32).init(
         1,
         2,
@@ -8039,7 +8039,7 @@ test "mulScalar_matrix4x2" {
     );
     const R = A.mulScalar(9);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x2(f32).init(
         9,
         18,
         27,
@@ -8051,7 +8051,7 @@ test "mulScalar_matrix4x2" {
     ), 0.0001));
 }
 
-test "mulVector2_matrix4x2" {
+test "Matrix4x2.mulVector2" {
     const A = Matrix4x2(f32).init(
         1,
         2,
@@ -8065,10 +8065,10 @@ test "mulVector2_matrix4x2" {
     const v = Vector2(f32).init(9, 10);
     const R = A.mulVector2(&v);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Vector4(f32).init(29, 67, 105, 143), 0.0001));
+    try std.testing.expect(R.approxEqual(&Vector4(f32).init(29, 67, 105, 143), 0.0001));
 }
 
-test "mulMatrix2x2_matrix4x2" {
+test "Matrix4x2.mulMatrix2x2" {
     const A = Matrix4x2(f32).init(
         1,
         2,
@@ -8087,7 +8087,7 @@ test "mulMatrix2x2_matrix4x2" {
     );
     const R = A.mulMatrix2x2(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x2(f32).init(
         31,
         34,
         71,
@@ -8099,7 +8099,7 @@ test "mulMatrix2x2_matrix4x2" {
     ), 0.0001));
 }
 
-test "mulMatrix2x3_matrix4x2" {
+test "Matrix4x2.mulMatrix2x3" {
     const A = Matrix4x2(f32).init(
         1,
         2,
@@ -8120,7 +8120,7 @@ test "mulMatrix2x3_matrix4x2" {
     );
     const R = A.mulMatrix2x3(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x3(f32).init(
         33,
         36,
         39,
@@ -8136,7 +8136,7 @@ test "mulMatrix2x3_matrix4x2" {
     ), 0.0001));
 }
 
-test "mulMatrix2x4_matrix4x2" {
+test "Matrix4x2.mulMatrix2x4" {
     const A = Matrix4x2(f32).init(
         1,
         2,
@@ -8159,7 +8159,7 @@ test "mulMatrix2x4_matrix4x2" {
     );
     const R = A.mulMatrix2x4(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x4(f32).init(
         35,
         38,
         41,
@@ -8179,7 +8179,7 @@ test "mulMatrix2x4_matrix4x2" {
     ), 0.0001));
 }
 
-test "div_matrix4x2" {
+test "Matrix4x2.div" {
     const A = Matrix4x2(f32).init(
         1,
         2,
@@ -8202,7 +8202,7 @@ test "div_matrix4x2" {
     );
     const R = A.div(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x2(f32).init(
         0.1111,
         0.2,
         0.2727,
@@ -8214,7 +8214,7 @@ test "div_matrix4x2" {
     ), 0.0001));
 }
 
-test "divScalar_matrix4x2" {
+test "Matrix4x2.divScalar" {
     const A = Matrix4x2(f32).init(
         1,
         2,
@@ -8227,7 +8227,7 @@ test "divScalar_matrix4x2" {
     );
     const R = A.divScalar(9);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x2(f32).init(
         0.1111,
         0.2222,
         0.3333,
@@ -8239,7 +8239,7 @@ test "divScalar_matrix4x2" {
     ), 0.0001));
 }
 
-test "transpose_matrix4x2" {
+test "Matrix4x2.transpose" {
     const A = Matrix4x2(f32).init(
         1,
         2,
@@ -8252,7 +8252,7 @@ test "transpose_matrix4x2" {
     );
     const R = A.transpose();
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix2x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix2x4(f32).init(
         1,
         3,
         5,
@@ -8264,7 +8264,7 @@ test "transpose_matrix4x2" {
     ), 0.0001));
 }
 
-test "add_matrix4x3" {
+test "Matrix4x3.add" {
     const A = Matrix4x3(f32).init(
         1,
         2,
@@ -8295,7 +8295,7 @@ test "add_matrix4x3" {
     );
     const R = A.add(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x3(f32).init(
         14,
         16,
         18,
@@ -8311,7 +8311,7 @@ test "add_matrix4x3" {
     ), 0.0001));
 }
 
-test "addScalar_matrix4x3" {
+test "Matrix4x3.addScalar" {
     const A = Matrix4x3(f32).init(
         1,
         2,
@@ -8328,7 +8328,7 @@ test "addScalar_matrix4x3" {
     );
     const R = A.addScalar(13);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x3(f32).init(
         14,
         15,
         16,
@@ -8344,7 +8344,7 @@ test "addScalar_matrix4x3" {
     ), 0.0001));
 }
 
-test "sub_matrix4x3" {
+test "Matrix4x3.sub" {
     const A = Matrix4x3(f32).init(
         1,
         2,
@@ -8375,7 +8375,7 @@ test "sub_matrix4x3" {
     );
     const R = A.sub(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x3(f32).init(
         -12,
         -12,
         -12,
@@ -8391,7 +8391,7 @@ test "sub_matrix4x3" {
     ), 0.0001));
 }
 
-test "subScalar_matrix4x3" {
+test "Matrix4x3.subScalar" {
     const A = Matrix4x3(f32).init(
         1,
         2,
@@ -8408,7 +8408,7 @@ test "subScalar_matrix4x3" {
     );
     const R = A.subScalar(13);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x3(f32).init(
         -12,
         -11,
         -10,
@@ -8424,7 +8424,7 @@ test "subScalar_matrix4x3" {
     ), 0.0001));
 }
 
-test "negate_matrix4x3" {
+test "Matrix4x3.negate" {
     const A = Matrix4x3(f32).init(
         1,
         2,
@@ -8441,7 +8441,7 @@ test "negate_matrix4x3" {
     );
     const R = A.negate();
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x3(f32).init(
         -1,
         -2,
         -3,
@@ -8457,7 +8457,7 @@ test "negate_matrix4x3" {
     ), 0.0001));
 }
 
-test "mul_matrix4x3" {
+test "Matrix4x3.mul" {
     const A = Matrix4x3(f32).init(
         1,
         2,
@@ -8488,7 +8488,7 @@ test "mul_matrix4x3" {
     );
     const R = A.mul(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x3(f32).init(
         13,
         28,
         45,
@@ -8504,7 +8504,7 @@ test "mul_matrix4x3" {
     ), 0.0001));
 }
 
-test "mulScalar_matrix4x3" {
+test "Matrix4x3.mulScalar" {
     const A = Matrix4x3(f32).init(
         1,
         2,
@@ -8521,7 +8521,7 @@ test "mulScalar_matrix4x3" {
     );
     const R = A.mulScalar(13);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x3(f32).init(
         13,
         26,
         39,
@@ -8537,7 +8537,7 @@ test "mulScalar_matrix4x3" {
     ), 0.0001));
 }
 
-test "mulVector3_matrix4x3" {
+test "Matrix4x3.mulVector3" {
     const A = Matrix4x3(f32).init(
         1,
         2,
@@ -8555,10 +8555,10 @@ test "mulVector3_matrix4x3" {
     const v = Vector3(f32).init(13, 14, 15);
     const R = A.mulVector3(&v);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Vector4(f32).init(86, 212, 338, 464), 0.0001));
+    try std.testing.expect(R.approxEqual(&Vector4(f32).init(86, 212, 338, 464), 0.0001));
 }
 
-test "mulMatrix3x2_matrix4x3" {
+test "Matrix4x3.mulMatrix3x2" {
     const A = Matrix4x3(f32).init(
         1,
         2,
@@ -8583,7 +8583,7 @@ test "mulMatrix3x2_matrix4x3" {
     );
     const R = A.mulMatrix3x2(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x2(f32).init(
         94,
         100,
         229,
@@ -8595,7 +8595,7 @@ test "mulMatrix3x2_matrix4x3" {
     ), 0.0001));
 }
 
-test "mulMatrix3x3_matrix4x3" {
+test "Matrix4x3.mulMatrix3x3" {
     const A = Matrix4x3(f32).init(
         1,
         2,
@@ -8623,7 +8623,7 @@ test "mulMatrix3x3_matrix4x3" {
     );
     const R = A.mulMatrix3x3(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x3(f32).init(
         102,
         108,
         114,
@@ -8639,7 +8639,7 @@ test "mulMatrix3x3_matrix4x3" {
     ), 0.0001));
 }
 
-test "mulMatrix3x4_matrix4x3" {
+test "Matrix4x3.mulMatrix3x4" {
     const A = Matrix4x3(f32).init(
         1,
         2,
@@ -8670,7 +8670,7 @@ test "mulMatrix3x4_matrix4x3" {
     );
     const R = A.mulMatrix3x4(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x4(f32).init(
         110,
         116,
         122,
@@ -8690,7 +8690,7 @@ test "mulMatrix3x4_matrix4x3" {
     ), 0.0001));
 }
 
-test "div_matrix4x3" {
+test "Matrix4x3.div" {
     const A = Matrix4x3(f32).init(
         1,
         2,
@@ -8721,7 +8721,7 @@ test "div_matrix4x3" {
     );
     const R = A.div(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x3(f32).init(
         0.0769,
         0.1428,
         0.2,
@@ -8737,7 +8737,7 @@ test "div_matrix4x3" {
     ), 0.0001));
 }
 
-test "divScalar_matrix4x3" {
+test "Matrix4x3.divScalar" {
     const A = Matrix4x3(f32).init(
         1,
         2,
@@ -8754,7 +8754,7 @@ test "divScalar_matrix4x3" {
     );
     const R = A.divScalar(13);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x3(f32).init(
         0.0769,
         0.1538,
         0.2307,
@@ -8770,7 +8770,7 @@ test "divScalar_matrix4x3" {
     ), 0.0001));
 }
 
-test "transpose_matrix4x3" {
+test "Matrix4x3.transpose" {
     const A = Matrix4x3(f32).init(
         1,
         2,
@@ -8787,7 +8787,7 @@ test "transpose_matrix4x3" {
     );
     const R = A.transpose();
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix3x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix3x4(f32).init(
         1,
         4,
         7,
@@ -8803,7 +8803,7 @@ test "transpose_matrix4x3" {
     ), 0.0001));
 }
 
-test "add_matrix4x4" {
+test "Matrix4x4.add" {
     const A = Matrix4x4(f32).init(
         1,
         2,
@@ -8842,7 +8842,7 @@ test "add_matrix4x4" {
     );
     const R = A.add(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x4(f32).init(
         18,
         20,
         22,
@@ -8862,7 +8862,7 @@ test "add_matrix4x4" {
     ), 0.0001));
 }
 
-test "addScalar_matrix4x4" {
+test "Matrix4x4.addScalar" {
     const A = Matrix4x4(f32).init(
         1,
         2,
@@ -8883,7 +8883,7 @@ test "addScalar_matrix4x4" {
     );
     const R = A.addScalar(17);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x4(f32).init(
         18,
         19,
         20,
@@ -8903,7 +8903,7 @@ test "addScalar_matrix4x4" {
     ), 0.0001));
 }
 
-test "sub_matrix4x4" {
+test "Matrix4x4.sub" {
     const A = Matrix4x4(f32).init(
         1,
         2,
@@ -8942,7 +8942,7 @@ test "sub_matrix4x4" {
     );
     const R = A.sub(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x4(f32).init(
         -16,
         -16,
         -16,
@@ -8962,7 +8962,7 @@ test "sub_matrix4x4" {
     ), 0.0001));
 }
 
-test "subScalar_matrix4x4" {
+test "Matrix4x4.subScalar" {
     const A = Matrix4x4(f32).init(
         1,
         2,
@@ -8983,7 +8983,7 @@ test "subScalar_matrix4x4" {
     );
     const R = A.subScalar(17);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x4(f32).init(
         -16,
         -15,
         -14,
@@ -9003,7 +9003,7 @@ test "subScalar_matrix4x4" {
     ), 0.0001));
 }
 
-test "negate_matrix4x4" {
+test "Matrix4x4.negate" {
     const A = Matrix4x4(f32).init(
         1,
         2,
@@ -9024,7 +9024,7 @@ test "negate_matrix4x4" {
     );
     const R = A.negate();
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x4(f32).init(
         -1,
         -2,
         -3,
@@ -9044,7 +9044,7 @@ test "negate_matrix4x4" {
     ), 0.0001));
 }
 
-test "mul_matrix4x4" {
+test "Matrix4x4.mul" {
     const A = Matrix4x4(f32).init(
         1,
         2,
@@ -9083,7 +9083,7 @@ test "mul_matrix4x4" {
     );
     const R = A.mul(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x4(f32).init(
         17,
         36,
         57,
@@ -9103,7 +9103,7 @@ test "mul_matrix4x4" {
     ), 0.0001));
 }
 
-test "mulScalar_matrix4x4" {
+test "Matrix4x4.mulScalar" {
     const A = Matrix4x4(f32).init(
         1,
         2,
@@ -9124,7 +9124,7 @@ test "mulScalar_matrix4x4" {
     );
     const R = A.mulScalar(17);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x4(f32).init(
         17,
         34,
         51,
@@ -9144,7 +9144,7 @@ test "mulScalar_matrix4x4" {
     ), 0.0001));
 }
 
-test "mulVector3_matrix4x4" {
+test "Matrix4x4.mulVector3" {
     const A = Matrix4x4(f32).init(
         1,
         2,
@@ -9166,10 +9166,10 @@ test "mulVector3_matrix4x4" {
     const v = Vector3(f32).init(17, 18, 19);
     const R = A.mulVector3(&v);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Vector3(f32).init(114, 334, 554), 0.0001));
+    try std.testing.expect(R.approxEqual(&Vector3(f32).init(114, 334, 554), 0.0001));
 }
 
-test "mulVector4_matrix4x4" {
+test "Matrix4x4.mulVector4" {
     const A = Matrix4x4(f32).init(
         1,
         2,
@@ -9191,10 +9191,10 @@ test "mulVector4_matrix4x4" {
     const v = Vector4(f32).init(17, 18, 19, 20);
     const R = A.mulVector4(&v);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Vector4(f32).init(190, 486, 782, 1078), 0.0001));
+    try std.testing.expect(R.approxEqual(&Vector4(f32).init(190, 486, 782, 1078), 0.0001));
 }
 
-test "mulMatrix4x2_matrix4x4" {
+test "Matrix4x4.mulMatrix4x2" {
     const A = Matrix4x4(f32).init(
         1,
         2,
@@ -9225,7 +9225,7 @@ test "mulMatrix4x2_matrix4x4" {
     );
     const R = A.mulMatrix4x2(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x2(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x2(f32).init(
         210,
         220,
         530,
@@ -9237,7 +9237,7 @@ test "mulMatrix4x2_matrix4x4" {
     ), 0.0001));
 }
 
-test "mulMatrix4x3_matrix4x4" {
+test "Matrix4x4.mulMatrix4x3" {
     const A = Matrix4x4(f32).init(
         1,
         2,
@@ -9272,7 +9272,7 @@ test "mulMatrix4x3_matrix4x4" {
     );
     const R = A.mulMatrix4x3(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x3(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x3(f32).init(
         230,
         240,
         250,
@@ -9288,7 +9288,7 @@ test "mulMatrix4x3_matrix4x4" {
     ), 0.0001));
 }
 
-test "mulMatrix4x4_matrix4x4" {
+test "Matrix4x4.mulMatrix4x4" {
     const A = Matrix4x4(f32).init(
         1,
         2,
@@ -9327,7 +9327,7 @@ test "mulMatrix4x4_matrix4x4" {
     );
     const R = A.mulMatrix4x4(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x4(f32).init(
         250,
         260,
         270,
@@ -9347,7 +9347,7 @@ test "mulMatrix4x4_matrix4x4" {
     ), 0.0001));
 }
 
-test "div_matrix4x4" {
+test "Matrix4x4.div" {
     const A = Matrix4x4(f32).init(
         1,
         2,
@@ -9386,7 +9386,7 @@ test "div_matrix4x4" {
     );
     const R = A.div(&B);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x4(f32).init(
         0.0588,
         0.1111,
         0.1578,
@@ -9406,7 +9406,7 @@ test "div_matrix4x4" {
     ), 0.0001));
 }
 
-test "divScalar_matrix4x4" {
+test "Matrix4x4.divScalar" {
     const A = Matrix4x4(f32).init(
         1,
         2,
@@ -9427,7 +9427,7 @@ test "divScalar_matrix4x4" {
     );
     const R = A.divScalar(17);
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x4(f32).init(
         0.0588,
         0.1176,
         0.1764,
@@ -9447,7 +9447,7 @@ test "divScalar_matrix4x4" {
     ), 0.0001));
 }
 
-test "transpose_matrix4x4" {
+test "Matrix4x4.transpose" {
     const A = Matrix4x4(f32).init(
         1,
         2,
@@ -9468,7 +9468,7 @@ test "transpose_matrix4x4" {
     );
     const R = A.transpose();
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x4(f32).init(
         1,
         5,
         9,
@@ -9488,7 +9488,7 @@ test "transpose_matrix4x4" {
     ), 0.0001));
 }
 
-test "deteterminant_matrix4x4" {
+test "Matrix4x4.deteterminant" {
     const A = Matrix4x4(f32).init(
         1,
         2,
@@ -9512,7 +9512,7 @@ test "deteterminant_matrix4x4" {
     try std.testing.expectApproxEqRel(0, R, 0.0001);
 }
 
-test "inverse_matrix4x4" {
+test "Matrix4x4.inverse" {
     const A = Matrix4x4(f32).init(
         1,
         2,
@@ -9533,7 +9533,7 @@ test "inverse_matrix4x4" {
     );
     const R = try A.inverse();
 
-    try std.testing.expectEqual(true, R.approxEqual(&Matrix4x4(f32).init(
+    try std.testing.expect(R.approxEqual(&Matrix4x4(f32).init(
         -2.8918,
         1.3963,
         0.3543,
@@ -9553,7 +9553,7 @@ test "inverse_matrix4x4" {
     ), 0.0001));
 }
 
-test "trace_matrix4x4" {
+test "Matrix4x4.trace" {
     const A = Matrix4x4(f32).init(
         1,
         2,
@@ -9577,293 +9577,293 @@ test "trace_matrix4x4" {
     try std.testing.expectApproxEqRel(34, R, 0.0001);
 }
 
-test "scale_matrix4x4" {
+test "Matrix4x4.scale" {
     const v = Vector3(f32).init(1, 2, 3);
     const w = Vector4(f32).init(4, 5, 6, 1);
     const A = Matrix4x4(f32).scale(7, 8, 9);
     const Ainv = A.scaleInverse();
     var R1 = A.mulVector3(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector3(f32).init(7, 16, 27), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector3(f32).init(7, 16, 27), 0.0001));
 
     R1 = Ainv.mulVector3(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector4(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector4(f32).init(28, 40, 54, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(28, 40, 54, 1), 0.0001));
 
     R2 = Ainv.mulVector4(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "shearX_matrix4x4" {
+test "Matrix4x4.shearX" {
     const v = Vector3(f32).init(1, 2, 3);
     const w = Vector4(f32).init(4, 5, 6, 1);
     const A = Matrix4x4(f32).shearX(7, 8);
     const Ainv = A.shearInverse();
     var R1 = A.mulVector3(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector3(f32).init(39, 2, 3), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector3(f32).init(39, 2, 3), 0.0001));
 
     R1 = Ainv.mulVector3(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector4(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector4(f32).init(87, 5, 6, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(87, 5, 6, 1), 0.0001));
 
     R2 = Ainv.mulVector4(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "shearY_matrix4x4" {
+test "Matrix4x4.shearY" {
     const v = Vector3(f32).init(1, 2, 3);
     const w = Vector4(f32).init(4, 5, 6, 1);
     const A = Matrix4x4(f32).shearY(7, 8);
     const Ainv = A.shearInverse();
     var R1 = A.mulVector3(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector3(f32).init(1, 33, 3), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector3(f32).init(1, 33, 3), 0.0001));
 
     R1 = Ainv.mulVector3(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector4(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector4(f32).init(4, 81, 6, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(4, 81, 6, 1), 0.0001));
 
     R2 = Ainv.mulVector4(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "shearZ_matrix4x4" {
+test "Matrix4x4.shearZ" {
     const v = Vector3(f32).init(1, 2, 3);
     const w = Vector4(f32).init(4, 5, 6, 1);
     const A = Matrix4x4(f32).shearZ(7, 8);
     const Ainv = A.shearInverse();
     var R1 = A.mulVector3(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector3(f32).init(1, 2, 26), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector3(f32).init(1, 2, 26), 0.0001));
 
     R1 = Ainv.mulVector3(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector4(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector4(f32).init(4, 5, 74, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(4, 5, 74, 1), 0.0001));
 
     R2 = Ainv.mulVector4(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "rotateLH_matrix4x4" {
+test "Matrix4x4.rotateLH" {
     const v = Vector3(f32).init(1, 2, 3);
     const w = Vector4(f32).init(4, 5, 6, 1);
     const A = Matrix4x4(f32).rotateLH(3.14159 / 2.0, &Vector3(f32).init(0, 1, 0).normalize());
     const Ainv = A.rotateInverse();
     var R1 = A.mulVector3(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector3(f32).init(-3, 2, 1), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector3(f32).init(-3, 2, 1), 0.0001));
 
     R1 = Ainv.mulVector3(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector4(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector4(f32).init(-6, 5, 4, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(-6, 5, 4, 1), 0.0001));
 
     R2 = Ainv.mulVector4(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "rotateRH_matrix4x4" {
+test "Matrix4x4.rotateRH" {
     const v = Vector3(f32).init(1, 2, 3);
     const w = Vector4(f32).init(4, 5, 6, 1);
     const A = Matrix4x4(f32).rotateRH(3.14159 / 2.0, &Vector3(f32).init(0, 1, 0).normalize());
     const Ainv = A.rotateInverse();
     var R1 = A.mulVector3(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector3(f32).init(3, 2, -1), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector3(f32).init(3, 2, -1), 0.0001));
 
     R1 = Ainv.mulVector3(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector4(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector4(f32).init(6, 5, -4, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(6, 5, -4, 1), 0.0001));
 
     R2 = Ainv.mulVector4(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "rotateXLH_matrix4x4" {
+test "Matrix4x4.rotateXLH" {
     const v = Vector3(f32).init(1, 2, 3);
     const w = Vector4(f32).init(4, 5, 6, 1);
     const A = Matrix4x4(f32).rotateXLH(3.14159 / 2.0);
     const Ainv = A.rotateInverse();
     var R1 = A.mulVector3(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector3(f32).init(1, 3, -2), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector3(f32).init(1, 3, -2), 0.0001));
 
     R1 = Ainv.mulVector3(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector4(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector4(f32).init(4, 6, -5, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(4, 6, -5, 1), 0.0001));
 
     R2 = Ainv.mulVector4(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "rotateXRH_matrix4x4" {
+test "Matrix4x4.rotateXRH" {
     const v = Vector3(f32).init(1, 2, 3);
     const w = Vector4(f32).init(4, 5, 6, 1);
     const A = Matrix4x4(f32).rotateXRH(3.14159 / 2.0);
     const Ainv = A.rotateInverse();
     var R1 = A.mulVector3(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector3(f32).init(1, -3, 2), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector3(f32).init(1, -3, 2), 0.0001));
 
     R1 = Ainv.mulVector3(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector4(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector4(f32).init(4, -6, 5, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(4, -6, 5, 1), 0.0001));
 
     R2 = Ainv.mulVector4(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "rotateYLH_matrix4x4" {
+test "Matrix4x4.rotateYLH" {
     const v = Vector3(f32).init(1, 2, 3);
     const w = Vector4(f32).init(4, 5, 6, 1);
     const A = Matrix4x4(f32).rotateYLH(3.14159 / 2.0);
     const Ainv = A.rotateInverse();
     var R1 = A.mulVector3(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector3(f32).init(-3, 2, 1), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector3(f32).init(-3, 2, 1), 0.0001));
 
     R1 = Ainv.mulVector3(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector4(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector4(f32).init(-6, 5, 4, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(-6, 5, 4, 1), 0.0001));
 
     R2 = Ainv.mulVector4(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "rotateYRH_matrix4x4" {
+test "Matrix4x4.rotateYRH" {
     const v = Vector3(f32).init(1, 2, 3);
     const w = Vector4(f32).init(4, 5, 6, 1);
     const A = Matrix4x4(f32).rotateYRH(3.14159 / 2.0);
     const Ainv = A.rotateInverse();
     var R1 = A.mulVector3(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector3(f32).init(3, 2, -1), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector3(f32).init(3, 2, -1), 0.0001));
 
     R1 = Ainv.mulVector3(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector4(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector4(f32).init(6, 5, -4, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(6, 5, -4, 1), 0.0001));
 
     R2 = Ainv.mulVector4(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "rotateZLH_matrix4x4" {
+test "Matrix4x4.rotateZLH" {
     const v = Vector3(f32).init(1, 2, 3);
     const w = Vector4(f32).init(4, 5, 6, 1);
     const A = Matrix4x4(f32).rotateZLH(3.14159 / 2.0);
     const Ainv = A.rotateInverse();
     var R1 = A.mulVector3(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector3(f32).init(2, -1, 3), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector3(f32).init(2, -1, 3), 0.0001));
 
     R1 = Ainv.mulVector3(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector4(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector4(f32).init(5, -4, 6, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(5, -4, 6, 1), 0.0001));
 
     R2 = Ainv.mulVector4(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "rotateZRH_matrix4x4" {
+test "Matrix4x4.rotateZRH" {
     const v = Vector3(f32).init(1, 2, 3);
     const w = Vector4(f32).init(4, 5, 6, 1);
     const A = Matrix4x4(f32).rotateZRH(3.14159 / 2.0);
     const Ainv = A.rotateInverse();
     var R1 = A.mulVector3(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector3(f32).init(-2, 1, 3), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector3(f32).init(-2, 1, 3), 0.0001));
 
     R1 = Ainv.mulVector3(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector4(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector4(f32).init(-5, 4, 6, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(-5, 4, 6, 1), 0.0001));
 
     R2 = Ainv.mulVector4(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "reflect_matrix4x4" {
+test "Matrix4x4.reflect" {
     const v = Vector3(f32).init(1, 2, 3);
     const w = Vector4(f32).init(4, 5, 6, 1);
     const N = Vector3(f32).init(0, 1, 0);
     const A = Matrix4x4(f32).reflect(&N.normalize());
     var R1 = A.mulVector3(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector3(f32).init(1, -2, 3), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector3(f32).init(1, -2, 3), 0.0001));
 
     R1 = A.mulVector3(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector4(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector4(f32).init(4, -5, 6, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(4, -5, 6, 1), 0.0001));
 
     R2 = A.mulVector4(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "reflectPoint_matrix4x4" {
+test "Matrix4x4.reflectPoint" {
     const v = Vector3(f32).init(1, 2, 3);
     const w = Vector4(f32).init(4, 5, 6, 1);
     const N = Vector3(f32).init(0, 1, 0);
@@ -9871,44 +9871,44 @@ test "reflectPoint_matrix4x4" {
     const A = Matrix4x4(f32).reflectPoint(&N.normalize(), &p);
     var R1 = A.mulVector3(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector3(f32).init(1, 0, 3), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector3(f32).init(1, 0, 3), 0.0001));
 
     R1 = A.mulVector3(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector4(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector4(f32).init(4, -3, 6, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(4, -3, 6, 1), 0.0001));
 
     R2 = A.mulVector4(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "translate_matrix4x4" {
+test "Matrix4x4.translate" {
     const v = Vector3(f32).init(1, 2, 3);
     const w = Vector4(f32).init(4, 5, 6, 1);
     const A = Matrix4x4(f32).translate(7, 8, 9);
     const Ainv = A.translateInverse();
     var R1 = A.mulVector3(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector3(f32).init(8, 10, 12), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector3(f32).init(8, 10, 12), 0.0001));
 
     R1 = Ainv.mulVector3(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector4(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector4(f32).init(11, 13, 15, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(11, 13, 15, 1), 0.0001));
 
     R2 = Ainv.mulVector4(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "lookAtLH_matrix4x4" {
+test "Matrix4x4.lookAtLH" {
     const v = Vector3(f32).init(1, 2, 3);
     const w = Vector4(f32).init(4, 5, 6, 1);
     const eye = Vector3(f32).init(0, 0, 0);
@@ -9918,22 +9918,22 @@ test "lookAtLH_matrix4x4" {
     const Ainv = A.lookAtInverse();
     var R1 = A.mulVector3(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector3(f32).init(1, -0.7071, 3.5355), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector3(f32).init(1, -0.7071, 3.5355), 0.0001));
 
     R1 = Ainv.mulVector3(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector4(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector4(f32).init(4, -0.7071, 7.7781, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(4, -0.7071, 7.7781, 1), 0.0001));
 
     R2 = Ainv.mulVector4(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "lookAtRH_matrix4x4" {
+test "Matrix4x4.lookAtRH" {
     const v = Vector3(f32).init(1, 2, 3);
     const w = Vector4(f32).init(4, 5, 6, 1);
     const eye = Vector3(f32).init(0, 0, 0);
@@ -9943,200 +9943,200 @@ test "lookAtRH_matrix4x4" {
     const Ainv = A.lookAtInverse();
     var R1 = A.mulVector3(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector3(f32).init(-1, -0.7071, -3.5355), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector3(f32).init(-1, -0.7071, -3.5355), 0.0001));
 
     R1 = Ainv.mulVector3(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector4(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector4(f32).init(-4, -0.7071, -7.7781, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(-4, -0.7071, -7.7781, 1), 0.0001));
 
     R2 = Ainv.mulVector4(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "perspectiveLHNO_matrix4x4" {
+test "Matrix4x4.perspectiveLHNO" {
     const v = Vector4(f32).init(1, 2, 3, 1);
     const w = Vector4(f32).init(4, 5, 6, 1);
     const A = Matrix4x4(f32).perspectiveLHNO(std.math.degreesToRadians(90.0), 16.0 / 9.0, 0.1, 100.0);
     const Ainv = A.perspectiveInverseLH();
     var R1 = A.mulVector4(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector4(f32).init(0.5625, 2, 2.8058, 3), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector4(f32).init(0.5625, 2, 2.8058, 3), 0.0001));
 
     R1 = Ainv.mulVector4(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector4(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector4(f32).init(2.25, 5, 5.8118, 6), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(2.25, 5, 5.8118, 6), 0.0001));
 
     R2 = Ainv.mulVector4(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "perspectiveRHNO_matrix4x4" {
+test "Matrix4x4.perspectiveRHNO" {
     const v = Vector4(f32).init(1, 2, 3, 1);
     const w = Vector4(f32).init(4, 5, 6, 1);
     const A = Matrix4x4(f32).perspectiveRHNO(std.math.degreesToRadians(90.0), 16.0 / 9.0, 0.1, 100.0);
     const Ainv = A.perspectiveInverseRH();
     var R1 = A.mulVector4(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector4(f32).init(0.5625, 2, -3.2062, -3), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector4(f32).init(0.5625, 2, -3.2062, -3), 0.0001));
 
     R1 = Ainv.mulVector4(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector4(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector4(f32).init(2.25, 5, -6.2122, -6), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(2.25, 5, -6.2122, -6), 0.0001));
 
     R2 = Ainv.mulVector4(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "perspectiveLHZO_matrix4x4" {
+test "Matrix4x4.perspectiveLHZO" {
     const v = Vector4(f32).init(1, 2, 3, 1);
     const w = Vector4(f32).init(4, 5, 6, 1);
     const A = Matrix4x4(f32).perspectiveLHZO(std.math.degreesToRadians(90.0), 16.0 / 9.0, 0.1, 100.0);
     const Ainv = A.perspectiveInverseLH();
     var R1 = A.mulVector4(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector4(f32).init(0.5625, 2, 2.9029, 3), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector4(f32).init(0.5625, 2, 2.9029, 3), 0.0001));
 
     R1 = Ainv.mulVector4(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector4(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector4(f32).init(2.25, 5, 5.9059, 6), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(2.25, 5, 5.9059, 6), 0.0001));
 
     R2 = Ainv.mulVector4(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "perspectiveRHZO_matrix4x4" {
+test "Matrix4x4.perspectiveRHZO" {
     const v = Vector4(f32).init(1, 2, 3, 1);
     const w = Vector4(f32).init(4, 5, 6, 1);
     const A = Matrix4x4(f32).perspectiveRHZO(std.math.degreesToRadians(90.0), 16.0 / 9.0, 0.1, 100.0);
     const Ainv = A.perspectiveInverseRH();
     var R1 = A.mulVector4(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector4(f32).init(0.5625, 2, -3.1031, -3), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector4(f32).init(0.5625, 2, -3.1031, -3), 0.0001));
 
     R1 = Ainv.mulVector4(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector4(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector4(f32).init(2.25, 5, -6.1061, -6), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(2.25, 5, -6.1061, -6), 0.0001));
 
     R2 = Ainv.mulVector4(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "orthographicLHNO_matrix4x4" {
+test "Matrix4x4.orthographicLHNO" {
     const v = Vector4(f32).init(1, 2, 3, 1);
     const w = Vector4(f32).init(4, 5, 6, 1);
     const A = Matrix4x4(f32).orthographicLHNO(-10.0, 10.0, -10.0, 10.0, 0.1, 100.0);
     const Ainv = A.orthographicInverse();
     var R1 = A.mulVector4(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector4(f32).init(0.1, 0.2, -0.9419, 1), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector4(f32).init(0.1, 0.2, -0.9419, 1), 0.0001));
 
     R1 = Ainv.mulVector4(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector4(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector4(f32).init(0.4, 0.5, -0.8818, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(0.4, 0.5, -0.8818, 1), 0.0001));
 
     R2 = Ainv.mulVector4(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "orthographicRHNO_matrix4x4" {
+test "Matrix4x4.orthographicRHNO" {
     const v = Vector4(f32).init(1, 2, 3, 1);
     const w = Vector4(f32).init(4, 5, 6, 1);
     const A = Matrix4x4(f32).orthographicRHNO(-10.0, 10.0, -10.0, 10.0, 0.1, 100.0);
     const Ainv = A.orthographicInverse();
     var R1 = A.mulVector4(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector4(f32).init(0.1, 0.2, -1.0620, 1), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector4(f32).init(0.1, 0.2, -1.0620, 1), 0.0001));
 
     R1 = Ainv.mulVector4(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector4(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector4(f32).init(0.4, 0.5, -1.1221, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(0.4, 0.5, -1.1221, 1), 0.0001));
 
     R2 = Ainv.mulVector4(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "orthographicLHZO_matrix4x4" {
+test "Matrix4x4.orthographicLHZO" {
     const v = Vector4(f32).init(1, 2, 3, 1);
     const w = Vector4(f32).init(4, 5, 6, 1);
     const A = Matrix4x4(f32).orthographicLHZO(-10.0, 10.0, -10.0, 10.0, 0.1, 100.0);
     const Ainv = A.orthographicInverse();
     var R1 = A.mulVector4(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector4(f32).init(0.1, 0.2, 0.0290, 1), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector4(f32).init(0.1, 0.2, 0.0290, 1), 0.0001));
 
     R1 = Ainv.mulVector4(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector4(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector4(f32).init(0.4, 0.5, 0.0590, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(0.4, 0.5, 0.0590, 1), 0.0001));
 
     R2 = Ainv.mulVector4(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "orthographicRHZO_matrix4x4" {
+test "Matrix4x4.orthographicRHZO" {
     const v = Vector4(f32).init(1, 2, 3, 1);
     const w = Vector4(f32).init(4, 5, 6, 1);
     const A = Matrix4x4(f32).orthographicRHZO(-10.0, 10.0, -10.0, 10.0, 0.1, 100.0);
     const Ainv = A.orthographicInverse();
     var R1 = A.mulVector4(&v);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&Vector4(f32).init(0.1, 0.2, -0.0310, 1), 0.0001));
+    try std.testing.expect(R1.approxEqual(&Vector4(f32).init(0.1, 0.2, -0.0310, 1), 0.0001));
 
     R1 = Ainv.mulVector4(&R1);
 
-    try std.testing.expectEqual(true, R1.approxEqual(&v, 0.0001));
+    try std.testing.expect(R1.approxEqual(&v, 0.0001));
 
     var R2 = A.mulVector4(&w);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&Vector4(f32).init(0.4, 0.5, -0.0610, 1), 0.0001));
+    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(0.4, 0.5, -0.0610, 1), 0.0001));
 
     R2 = Ainv.mulVector4(&R2);
 
-    try std.testing.expectEqual(true, R2.approxEqual(&w, 0.0001));
+    try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "applyTransform_matrix4x4" {
+test "Matrix4x4.applyTransform" {
     var A = Matrix4x4(f32).identity;
     A.applyTransform(Matrix4x4(f32).scale, .{ 2.0, 3.0, 4.0 });
 
-    try std.testing.expectEqual(true, A.approxEqual(&Matrix4x4(f32).scale(2.0, 3.0, 4.0), 0.0001));
+    try std.testing.expect(A.approxEqual(&Matrix4x4(f32).scale(2.0, 3.0, 4.0), 0.0001));
 }
