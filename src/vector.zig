@@ -889,7 +889,7 @@ pub fn Vector3(comptime T: type) type {
             return @reduce(.Add, v.v * w.v);
         }
 
-        /// Computes the left-handed cross product between two vectors:
+        /// Computes the cross product between two vectors:
         ///
         /// :math:`(v_y w_z - v_z w_y, v_z w_x - v_x w_z, v_x w_y - v_y w_x)`
         ///
@@ -898,28 +898,8 @@ pub fn Vector3(comptime T: type) type {
         /// - `w`: The second vector.
         ///
         /// **Returns**:
-        /// - The left-handed cross product between the two vectors.
-        pub inline fn crossLH(v: *const Vector3(T), w: *const Vector3(T)) Vector3(T) {
-            return Vector3(T){
-                .v = @Vector(3, T){
-                    -(v.v[1] * w.v[2] - v.v[2] * w.v[1]),
-                    -(v.v[2] * w.v[0] - v.v[0] * w.v[2]),
-                    -(v.v[0] * w.v[1] - v.v[1] * w.v[0]),
-                },
-            };
-        }
-
-        /// Computes the right-handed cross product between two vectors:
-        ///
-        /// :math:`(v_y w_z - v_z w_y, v_z w_x - v_x w_z, v_x w_y - v_y w_x)`
-        ///
-        /// **Parameters**:
-        /// - `v`: The first vector.
-        /// - `w`: The second vector.
-        ///
-        /// **Returns**:
-        /// - The right-handed cross product between the two vectors.
-        pub inline fn crossRH(v: *const Vector3(T), w: *const Vector3(T)) Vector3(T) {
+        /// - The cross product between the two vectors.
+        pub inline fn cross(v: *const Vector3(T), w: *const Vector3(T)) Vector3(T) {
             return Vector3(T){
                 .v = @Vector(3, T){
                     v.v[1] * w.v[2] - v.v[2] * w.v[1],
@@ -1993,18 +1973,10 @@ test "Vector3.dot" {
     try std.testing.expectApproxEqRel(32, r, 0.001);
 }
 
-test "Vector3.crossLH" {
+test "Vector3.cross" {
     const v = Vector3(f32).init(1, 2, 3);
     const w = Vector3(f32).init(4, 5, 6);
-    const r = v.crossLH(&w);
-
-    try std.testing.expect(r.approxEqual(&Vector3(f32).init(3, -6, 3), 0.0001));
-}
-
-test "Vector3.crossRH" {
-    const v = Vector3(f32).init(1, 2, 3);
-    const w = Vector3(f32).init(4, 5, 6);
-    const r = v.crossRH(&w);
+    const r = v.cross(&w);
 
     try std.testing.expect(r.approxEqual(&Vector3(f32).init(-3, 6, -3), 0.0001));
 }

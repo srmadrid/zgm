@@ -2151,27 +2151,14 @@ pub fn Matrix3x3(comptime T: type) type {
             return Matrix3x3(T).init(1, -A.m[1].v[0], 0, -A.m[0].v[1], 1, 0, 0, 0, 1);
         }
 
-        /// Generate the left-handed rotation matrix.
+        /// Generate the rotation matrix.
         ///
         /// **Parameters**:
         /// - `angle`: The rotation angle in radians.
         ///
         /// **Returns**:
         /// - The rotation matrix.
-        pub inline fn rotateLH(angle: T) Matrix3x3(T) {
-            const c = @cos(angle);
-            const s = @sin(angle);
-            return Matrix3x3(T).init(c, -s, 0, s, c, 0, 0, 0, 1);
-        }
-
-        /// Generate the right-handed rotation matrix.
-        ///
-        /// **Parameters**:
-        /// - `angle`: The rotation angle in radians.
-        ///
-        /// **Returns**:
-        /// - The rotation matrix.
-        pub inline fn rotateRH(angle: T) Matrix3x3(T) {
+        pub inline fn rotate(angle: T) Matrix3x3(T) {
             const c = @cos(angle);
             const s = @sin(angle);
             return Matrix3x3(T).init(c, s, 0, -s, c, 0, 0, 0, 1);
@@ -4277,7 +4264,7 @@ pub fn Matrix4x4(comptime T: type) type {
             );
         }
 
-        /// Generate the left-handed rotation matrix around an arbitrary axis.
+        /// Generate the rotation matrix around an arbitrary axis.
         ///
         /// **Parameters**:
         /// - `angle`: The rotation angle in radians.
@@ -4285,42 +4272,7 @@ pub fn Matrix4x4(comptime T: type) type {
         ///
         /// **Returns**:
         /// - The rotation matrix.
-        pub inline fn rotateLH(angle: T, axis: *const Vector3(T)) Matrix4x4(T) {
-            const c = @cos(-angle);
-            const s = @sin(-angle);
-            const t = 1 - c;
-            const x = axis.v[0];
-            const y = axis.v[1];
-            const z = axis.v[2];
-            return Matrix4x4(T).init(
-                t * x * x + c,
-                t * x * y - s * z,
-                t * x * z + s * y,
-                0,
-                t * x * y + s * z,
-                t * y * y + c,
-                t * y * z - s * x,
-                0,
-                t * x * z - s * y,
-                t * y * z + s * x,
-                t * z * z + c,
-                0,
-                0,
-                0,
-                0,
-                1,
-            );
-        }
-
-        /// Generate the right-handed rotation matrix around an arbitrary axis.
-        ///
-        /// **Parameters**:
-        /// - `angle`: The rotation angle in radians.
-        /// - `axis`: The rotation axis. Must be normalized.
-        ///
-        /// **Returns**:
-        /// - The rotation matrix.
-        pub inline fn rotateRH(angle: T, axis: *const Vector3(T)) Matrix4x4(T) {
+        pub inline fn rotate(angle: T, axis: *const Vector3(T)) Matrix4x4(T) {
             const c = @cos(angle);
             const s = @sin(angle);
             const t = 1 - c;
@@ -4347,44 +4299,14 @@ pub fn Matrix4x4(comptime T: type) type {
             );
         }
 
-        /// Generate the left-handed rotation matrix around the x-axis.
+        /// Generate the rotation matrix around the x-axis.
         ///
         /// **Parameters**:
         /// - `angle`: The rotation angle in radians.
         ///
         /// **Returns**:
         /// - The rotation matrix.
-        pub inline fn rotateXLH(angle: T) Matrix4x4(T) {
-            const c = @cos(-angle);
-            const s = @sin(-angle);
-            return Matrix4x4(T).init(
-                1,
-                0,
-                0,
-                0,
-                0,
-                c,
-                -s,
-                0,
-                0,
-                s,
-                c,
-                0,
-                0,
-                0,
-                0,
-                1,
-            );
-        }
-
-        /// Generate the right-handed rotation matrix around the x-axis.
-        ///
-        /// **Parameters**:
-        /// - `angle`: The rotation angle in radians.
-        ///
-        /// **Returns**:
-        /// - The rotation matrix.
-        pub inline fn rotateXRH(angle: T) Matrix4x4(T) {
+        pub inline fn rotateX(angle: T) Matrix4x4(T) {
             const c = @cos(angle);
             const s = @sin(angle);
             return Matrix4x4(T).init(
@@ -4407,44 +4329,14 @@ pub fn Matrix4x4(comptime T: type) type {
             );
         }
 
-        /// Generate the left-handed rotation matrix around the y-axis.
+        /// Generate the rotation matrix around the y-axis.
         ///
         /// **Parameters**:
         /// - `angle`: The rotation angle in radians.
         ///
         /// **Returns**:
         /// - The rotation matrix.
-        pub inline fn rotateYLH(angle: T) Matrix4x4(T) {
-            const c = @cos(-angle);
-            const s = @sin(-angle);
-            return Matrix4x4(T).init(
-                c,
-                0,
-                s,
-                0,
-                0,
-                1,
-                0,
-                0,
-                -s,
-                0,
-                c,
-                0,
-                0,
-                0,
-                0,
-                1,
-            );
-        }
-
-        /// Generate the right-handed rotation matrix around the y-axis.
-        ///
-        /// **Parameters**:
-        /// - `angle`: The rotation angle in radians.
-        ///
-        /// **Returns**:
-        /// - The rotation matrix.
-        pub inline fn rotateYRH(angle: T) Matrix4x4(T) {
+        pub inline fn rotateY(angle: T) Matrix4x4(T) {
             const c = @cos(angle);
             const s = @sin(angle);
             return Matrix4x4(T).init(
@@ -4467,44 +4359,14 @@ pub fn Matrix4x4(comptime T: type) type {
             );
         }
 
-        /// Generate the left-handed rotation matrix around the z-axis.
+        /// Generate the rotation matrix around the z-axis.
         ///
         /// **Parameters**:
         /// - `angle`: The rotation angle in radians.
         ///
         /// **Returns**:
         /// - The rotation matrix.
-        pub inline fn rotateZLH(angle: T) Matrix4x4(T) {
-            const c = @cos(-angle);
-            const s = @sin(-angle);
-            return Matrix4x4(T).init(
-                c,
-                -s,
-                0,
-                0,
-                s,
-                c,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                1,
-            );
-        }
-
-        /// Generate the right-handed rotation matrix around the z-axis.
-        ///
-        /// **Parameters**:
-        /// - `angle`: The rotation angle in radians.
-        ///
-        /// **Returns**:
-        /// - The rotation matrix.
-        pub inline fn rotateZRH(angle: T) Matrix4x4(T) {
+        pub inline fn rotateZ(angle: T) Matrix4x4(T) {
             const c = @cos(angle);
             const s = @sin(angle);
             return Matrix4x4(T).init(
@@ -4658,8 +4520,8 @@ pub fn Matrix4x4(comptime T: type) type {
             );
         }
 
-        /// Generate the view matrix for a left-handed coordinate system. The
-        /// view matrix transforms from world space to camera space.
+        /// Generate the view matrix for a coordinate system. The view matrix
+        /// transforms from world space to camera space.
         ///
         /// **Parameters**:
         /// - `eye`: The position of the camera.
@@ -4668,44 +4530,10 @@ pub fn Matrix4x4(comptime T: type) type {
         ///
         /// **Returns**:
         /// - The view matrix.
-        pub inline fn lookAtLH(eye: *const Vector3(T), center: *const Vector3(T), up: *const Vector3(T)) Matrix4x4(T) {
-            const f = Vector3(T).normalize(&Vector3(T).sub(eye, center));
-            const s = Vector3(T).normalize(&Vector3(T).crossRH(&f, up));
-            const u = Vector3(T).crossRH(&s, &f);
-            return Matrix4x4(T).init(
-                s.v[0],
-                s.v[1],
-                s.v[2],
-                -Vector3(T).dot(&s, eye),
-                u.v[0],
-                u.v[1],
-                u.v[2],
-                -Vector3(T).dot(&u, eye),
-                -f.v[0],
-                -f.v[1],
-                -f.v[2],
-                Vector3(T).dot(&f, eye),
-                0,
-                0,
-                0,
-                1,
-            );
-        }
-
-        /// Generate the view matrix for a right-handed coordinate system. The
-        /// view matrix transforms from world space to camera space.
-        ///
-        /// **Parameters**:
-        /// - `eye`: The position of the camera.
-        /// - `center`: The position to look at.
-        /// - `up`: The up direction.
-        ///
-        /// **Returns**:
-        /// - The view matrix.
-        pub inline fn lookAtRH(eye: *const Vector3(T), center: *const Vector3(T), up: *const Vector3(T)) Matrix4x4(T) {
+        pub inline fn lookAt(eye: *const Vector3(T), center: *const Vector3(T), up: *const Vector3(T)) Matrix4x4(T) {
             const f = Vector3(T).normalize(&Vector3(T).sub(center, eye));
-            const s = Vector3(T).normalize(&Vector3(T).crossRH(&f, up));
-            const u = Vector3(T).crossRH(&s, &f);
+            const s = Vector3(T).normalize(&Vector3(T).cross(&f, up));
+            const u = Vector3(T).cross(&s, &f);
             return Matrix4x4(T).init(
                 s.v[0],
                 s.v[1],
@@ -4737,9 +4565,9 @@ pub fn Matrix4x4(comptime T: type) type {
             return Matrix4x4(T).transpose(A);
         }
 
-        /// Generate the perspective projection matrix for a left-handed
-        /// coordinate system and negative-one-to-one depth range. The
-        /// projection matrix transforms from camera space to clip space.
+        /// Generate the perspective projection matrix for a negative-one-to-one
+        /// depth range. The projection matrix transforms from camera space to
+        /// clip space.
         ///
         /// **Parameters**:
         /// - `fov`: The field of view in radians.
@@ -4749,41 +4577,7 @@ pub fn Matrix4x4(comptime T: type) type {
         ///
         /// **Returns**:
         /// - The perspective projection matrix.
-        pub inline fn perspectiveLHNO(fov: T, aspect: T, near: T, far: T) Matrix4x4(T) {
-            const f = 1 / @tan(fov / 2);
-            return Matrix4x4(T).init(
-                f / aspect,
-                0,
-                0,
-                0,
-                0,
-                f,
-                0,
-                0,
-                0,
-                0,
-                (far + near) / (far - near),
-                (2 * near * far) / (near - far),
-                0,
-                0,
-                1,
-                0,
-            );
-        }
-
-        /// Generate the perspective projection matrix for a right-handed
-        /// coordinate system and negative-one-to-one depth range. The
-        /// projection matrix transforms from camera space to clip space.
-        ///
-        /// **Parameters**:
-        /// - `fov`: The field of view in radians.
-        /// - `aspect`: The aspect ratio.
-        /// - `near`: The distance to the near clipping plane.
-        /// - `far`: The distance to the far clipping plane.
-        ///
-        /// **Returns**:
-        /// - The perspective projection matrix.
-        pub inline fn perspectiveRHNO(fov: T, aspect: T, near: T, far: T) Matrix4x4(T) {
+        pub inline fn perspectiveNO(fov: T, aspect: T, near: T, far: T) Matrix4x4(T) {
             const f = 1 / @tan(fov / 2);
             return Matrix4x4(T).init(
                 f / aspect,
@@ -4805,9 +4599,9 @@ pub fn Matrix4x4(comptime T: type) type {
             );
         }
 
-        /// Generate the perspective projection matrix for a left-handed
-        /// coordinate system and zero-to-one depth range. The projection matrix
-        /// transforms from camera space to clip space.
+        /// Generate the perspective projection matrix for a zero-to-one depth
+        /// range. The projection matrix transforms from camera space to clip
+        /// space.
         ///
         /// **Parameters**:
         /// - `fov`: The field of view in radians.
@@ -4817,41 +4611,7 @@ pub fn Matrix4x4(comptime T: type) type {
         ///
         /// **Returns**:
         /// - The perspective projection matrix.
-        pub inline fn perspectiveLHZO(fov: T, aspect: T, near: T, far: T) Matrix4x4(T) {
-            const f = 1 / @tan(fov / 2);
-            return Matrix4x4(T).init(
-                f / aspect,
-                0,
-                0,
-                0,
-                0,
-                f,
-                0,
-                0,
-                0,
-                0,
-                far / (far - near),
-                near * far / (near - far),
-                0,
-                0,
-                1,
-                0,
-            );
-        }
-
-        /// Generate the perspective projection matrix for a right-handed
-        /// coordinate system and zero-to-one depth range. The projection matrix
-        /// transforms from camera space to clip space.
-        ///
-        /// **Parameters**:
-        /// - `fov`: The field of view in radians.
-        /// - `aspect`: The aspect ratio.
-        /// - `near`: The distance to the near clipping plane.
-        /// - `far`: The distance to the far clipping plane.
-        ///
-        /// **Returns**:
-        /// - The perspective projection matrix.
-        pub inline fn perspectiveRHZO(fov: T, aspect: T, near: T, far: T) Matrix4x4(T) {
+        pub inline fn perspectiveZO(fov: T, aspect: T, near: T, far: T) Matrix4x4(T) {
             const f = 1 / @tan(fov / 2);
             return Matrix4x4(T).init(
                 f / aspect,
@@ -4873,44 +4633,14 @@ pub fn Matrix4x4(comptime T: type) type {
             );
         }
 
-        /// Generate the inverse perspective projection matrix for a left-handed
-        /// coordinate system.
+        /// Generate the inverse perspective projection matrix.
         ///
         /// **Parameters**:
         /// - `A`: The perspective projection matrix.
         ///
         /// **Returns**:
         /// - The inverse perspective projection matrix.
-        pub inline fn perspectiveInverseLH(A: *const Matrix4x4(T)) Matrix4x4(T) {
-            return Matrix4x4(T).init(
-                1 / A.m[0].v[0],
-                0,
-                0,
-                0,
-                0,
-                1 / A.m[1].v[1],
-                0,
-                0,
-                0,
-                0,
-                0,
-                A.m[2].v[3],
-                0,
-                0,
-                1 / A.m[3].v[2],
-                A.m[2].v[2] / (-A.m[3].v[2]),
-            );
-        }
-
-        /// Generate the inverse perspective projection matrix for a
-        /// right-handed coordinate system.
-        ///
-        /// **Parameters**:
-        /// - `A`: The perspective projection matrix.
-        ///
-        /// **Returns**:
-        /// - The inverse perspective projection matrix.
-        pub inline fn perspectiveInverseRH(A: *const Matrix4x4(T)) Matrix4x4(T) {
+        pub inline fn perspectiveInverse(A: *const Matrix4x4(T)) Matrix4x4(T) {
             return Matrix4x4(T).init(
                 1 / A.m[0].v[0],
                 0,
@@ -4931,9 +4661,9 @@ pub fn Matrix4x4(comptime T: type) type {
             );
         }
 
-        /// Generate the orthographic projection matrix for a left-handed
-        /// coordinate system and negative-one-to-one depth range. The
-        /// projection matrix transforms from camera space to clip space.
+        /// Generate the orthographic projection matrix for a
+        /// negative-one-to-one depth range. The projection matrix transforms
+        /// from camera space to clip space.
         ///
         /// **Parameters**:
         /// - `left`: The left edge of the clipping plane.
@@ -4945,43 +4675,7 @@ pub fn Matrix4x4(comptime T: type) type {
         ///
         /// **Returns**:
         /// - The orthographic projection matrix.
-        pub inline fn orthographicLHNO(left: T, right: T, bottom: T, top: T, near: T, far: T) Matrix4x4(T) {
-            return Matrix4x4(T).init(
-                2 / (right - left),
-                0,
-                0,
-                (right + left) / (left - right),
-                0,
-                2 / (top - bottom),
-                0,
-                (top + bottom) / (bottom - top),
-                0,
-                0,
-                2 / (far - near),
-                (near + far) / (near - far),
-                0,
-                0,
-                0,
-                1,
-            );
-        }
-
-        /// Generate the orthographic projection matrix for a right-handed
-        /// coordinate system and negative-one-to-one depth range. The
-        /// projection matrix transforms from camera space to clip space.
-        /// The projection matrix transforms from camera space to clip space.
-        ///
-        /// **Parameters**:
-        /// - `left`: The left edge of the clipping plane.
-        /// - `right`: The right edge of the clipping plane.
-        /// - `bottom`: The bottom edge of the clipping plane.
-        /// - `top`: The top edge of the clipping plane.
-        /// - `near`: The distance to the near clipping plane.
-        /// - `far`: The distance to the far clipping plane.
-        ///
-        /// **Returns**:
-        /// - The orthographic projection matrix.
-        pub inline fn orthographicRHNO(left: T, right: T, bottom: T, top: T, near: T, far: T) Matrix4x4(T) {
+        pub inline fn orthographicNO(left: T, right: T, bottom: T, top: T, near: T, far: T) Matrix4x4(T) {
             return Matrix4x4(T).init(
                 2 / (right - left),
                 0,
@@ -5002,9 +4696,9 @@ pub fn Matrix4x4(comptime T: type) type {
             );
         }
 
-        /// Generate the orthographic projection matrix for a left-handed
-        /// coordinate system and zero-to-one depth range. The projection matrix
-        /// transforms from camera space to clip space.
+        /// Generate the orthographic projection matrix for a  zero-to-one depth
+        /// range. The projection matrix transforms from camera space to clip
+        /// space.
         ///
         /// **Parameters**:
         /// - `left`: The left edge of the clipping plane.
@@ -5016,42 +4710,7 @@ pub fn Matrix4x4(comptime T: type) type {
         ///
         /// **Returns**:
         /// - The orthographic projection matrix.
-        pub inline fn orthographicLHZO(left: T, right: T, bottom: T, top: T, near: T, far: T) Matrix4x4(T) {
-            return Matrix4x4(T).init(
-                2 / (right - left),
-                0,
-                0,
-                (right + left) / (left - right),
-                0,
-                2 / (top - bottom),
-                0,
-                (top + bottom) / (bottom - top),
-                0,
-                0,
-                1 / (far - near),
-                near / (near - far),
-                0,
-                0,
-                0,
-                1,
-            );
-        }
-
-        /// Generate the orthographic projection matrix for a right-handed
-        /// coordinate system and zero-to-one depth range. The projection matrix
-        /// transforms from camera space to clip space.
-        ///
-        /// **Parameters**:
-        /// - `left`: The left edge of the clipping plane.
-        /// - `right`: The right edge of the clipping plane.
-        /// - `bottom`: The bottom edge of the clipping plane.
-        /// - `top`: The top edge of the clipping plane.
-        /// - `near`: The distance to the near clipping plane.
-        /// - `far`: The distance to the far clipping plane.
-        ///
-        /// **Returns**:
-        /// - The orthographic projection matrix.
-        pub inline fn orthographicRHZO(left: T, right: T, bottom: T, top: T, near: T, far: T) Matrix4x4(T) {
+        pub inline fn orthographicZO(left: T, right: T, bottom: T, top: T, near: T, far: T) Matrix4x4(T) {
             return Matrix4x4(T).init(
                 2 / (right - left),
                 0,
@@ -7192,32 +6851,10 @@ test "Matrix3x3.shearY" {
     try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "Matrix3x3.rotateLH" {
+test "Matrix3x3.rotate" {
     const v = Vector2(f32).init(1, 2);
     const w = Vector3(f32).init(3, 4, 1);
-    const A = Matrix3x3(f32).rotateLH(3.14159 / 2.0);
-    const Ainv = A.rotateInverse();
-    var R1 = A.mulVector2(&v);
-
-    try std.testing.expect(R1.approxEqual(&Vector2(f32).init(-2, 1), 0.0001));
-
-    R1 = Ainv.mulVector2(&R1);
-
-    try std.testing.expect(R1.approxEqual(&v, 0.0001));
-
-    var R2 = A.mulVector3(&w);
-
-    try std.testing.expect(R2.approxEqual(&Vector3(f32).init(-4, 3, 1), 0.0001));
-
-    R2 = Ainv.mulVector3(&R2);
-
-    try std.testing.expect(R2.approxEqual(&w, 0.0001));
-}
-
-test "Matrix3x3.rotateRH" {
-    const v = Vector2(f32).init(1, 2);
-    const w = Vector3(f32).init(3, 4, 1);
-    const A = Matrix3x3(f32).rotateRH(3.14159 / 2.0);
+    const A = Matrix3x3(f32).rotate(3.14159 / 2.0);
     const Ainv = A.rotateInverse();
     var R1 = A.mulVector2(&v);
 
@@ -9665,32 +9302,10 @@ test "Matrix4x4.shearZ" {
     try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "Matrix4x4.rotateLH" {
+test "Matrix4x4.rotate" {
     const v = Vector3(f32).init(1, 2, 3);
     const w = Vector4(f32).init(4, 5, 6, 1);
-    const A = Matrix4x4(f32).rotateLH(3.14159 / 2.0, &Vector3(f32).init(0, 1, 0).normalize());
-    const Ainv = A.rotateInverse();
-    var R1 = A.mulVector3(&v);
-
-    try std.testing.expect(R1.approxEqual(&Vector3(f32).init(-3, 2, 1), 0.0001));
-
-    R1 = Ainv.mulVector3(&R1);
-
-    try std.testing.expect(R1.approxEqual(&v, 0.0001));
-
-    var R2 = A.mulVector4(&w);
-
-    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(-6, 5, 4, 1), 0.0001));
-
-    R2 = Ainv.mulVector4(&R2);
-
-    try std.testing.expect(R2.approxEqual(&w, 0.0001));
-}
-
-test "Matrix4x4.rotateRH" {
-    const v = Vector3(f32).init(1, 2, 3);
-    const w = Vector4(f32).init(4, 5, 6, 1);
-    const A = Matrix4x4(f32).rotateRH(3.14159 / 2.0, &Vector3(f32).init(0, 1, 0).normalize());
+    const A = Matrix4x4(f32).rotate(3.14159 / 2.0, &Vector3(f32).init(0, 1, 0).normalize());
     const Ainv = A.rotateInverse();
     var R1 = A.mulVector3(&v);
 
@@ -9709,32 +9324,10 @@ test "Matrix4x4.rotateRH" {
     try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "Matrix4x4.rotateXLH" {
+test "Matrix4x4.rotateX" {
     const v = Vector3(f32).init(1, 2, 3);
     const w = Vector4(f32).init(4, 5, 6, 1);
-    const A = Matrix4x4(f32).rotateXLH(3.14159 / 2.0);
-    const Ainv = A.rotateInverse();
-    var R1 = A.mulVector3(&v);
-
-    try std.testing.expect(R1.approxEqual(&Vector3(f32).init(1, 3, -2), 0.0001));
-
-    R1 = Ainv.mulVector3(&R1);
-
-    try std.testing.expect(R1.approxEqual(&v, 0.0001));
-
-    var R2 = A.mulVector4(&w);
-
-    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(4, 6, -5, 1), 0.0001));
-
-    R2 = Ainv.mulVector4(&R2);
-
-    try std.testing.expect(R2.approxEqual(&w, 0.0001));
-}
-
-test "Matrix4x4.rotateXRH" {
-    const v = Vector3(f32).init(1, 2, 3);
-    const w = Vector4(f32).init(4, 5, 6, 1);
-    const A = Matrix4x4(f32).rotateXRH(3.14159 / 2.0);
+    const A = Matrix4x4(f32).rotateX(3.14159 / 2.0);
     const Ainv = A.rotateInverse();
     var R1 = A.mulVector3(&v);
 
@@ -9753,32 +9346,10 @@ test "Matrix4x4.rotateXRH" {
     try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "Matrix4x4.rotateYLH" {
+test "Matrix4x4.rotateY" {
     const v = Vector3(f32).init(1, 2, 3);
     const w = Vector4(f32).init(4, 5, 6, 1);
-    const A = Matrix4x4(f32).rotateYLH(3.14159 / 2.0);
-    const Ainv = A.rotateInverse();
-    var R1 = A.mulVector3(&v);
-
-    try std.testing.expect(R1.approxEqual(&Vector3(f32).init(-3, 2, 1), 0.0001));
-
-    R1 = Ainv.mulVector3(&R1);
-
-    try std.testing.expect(R1.approxEqual(&v, 0.0001));
-
-    var R2 = A.mulVector4(&w);
-
-    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(-6, 5, 4, 1), 0.0001));
-
-    R2 = Ainv.mulVector4(&R2);
-
-    try std.testing.expect(R2.approxEqual(&w, 0.0001));
-}
-
-test "Matrix4x4.rotateYRH" {
-    const v = Vector3(f32).init(1, 2, 3);
-    const w = Vector4(f32).init(4, 5, 6, 1);
-    const A = Matrix4x4(f32).rotateYRH(3.14159 / 2.0);
+    const A = Matrix4x4(f32).rotateY(3.14159 / 2.0);
     const Ainv = A.rotateInverse();
     var R1 = A.mulVector3(&v);
 
@@ -9797,32 +9368,10 @@ test "Matrix4x4.rotateYRH" {
     try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "Matrix4x4.rotateZLH" {
+test "Matrix4x4.rotateZ" {
     const v = Vector3(f32).init(1, 2, 3);
     const w = Vector4(f32).init(4, 5, 6, 1);
-    const A = Matrix4x4(f32).rotateZLH(3.14159 / 2.0);
-    const Ainv = A.rotateInverse();
-    var R1 = A.mulVector3(&v);
-
-    try std.testing.expect(R1.approxEqual(&Vector3(f32).init(2, -1, 3), 0.0001));
-
-    R1 = Ainv.mulVector3(&R1);
-
-    try std.testing.expect(R1.approxEqual(&v, 0.0001));
-
-    var R2 = A.mulVector4(&w);
-
-    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(5, -4, 6, 1), 0.0001));
-
-    R2 = Ainv.mulVector4(&R2);
-
-    try std.testing.expect(R2.approxEqual(&w, 0.0001));
-}
-
-test "Matrix4x4.rotateZRH" {
-    const v = Vector3(f32).init(1, 2, 3);
-    const w = Vector4(f32).init(4, 5, 6, 1);
-    const A = Matrix4x4(f32).rotateZRH(3.14159 / 2.0);
+    const A = Matrix4x4(f32).rotateZ(3.14159 / 2.0);
     const Ainv = A.rotateInverse();
     var R1 = A.mulVector3(&v);
 
@@ -9908,38 +9457,13 @@ test "Matrix4x4.translate" {
     try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "Matrix4x4.lookAtLH" {
+test "Matrix4x4.lookAt" {
     const v = Vector3(f32).init(1, 2, 3);
     const w = Vector4(f32).init(4, 5, 6, 1);
     const eye = Vector3(f32).init(0, 0, 0);
     const center = Vector3(f32).init(0, 1, 1);
     const up = Vector3(f32).init(0, 1, 0);
-    const A = Matrix4x4(f32).lookAtLH(&eye, &center, &up);
-    const Ainv = A.lookAtInverse();
-    var R1 = A.mulVector3(&v);
-
-    try std.testing.expect(R1.approxEqual(&Vector3(f32).init(1, -0.7071, 3.5355), 0.0001));
-
-    R1 = Ainv.mulVector3(&R1);
-
-    try std.testing.expect(R1.approxEqual(&v, 0.0001));
-
-    var R2 = A.mulVector4(&w);
-
-    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(4, -0.7071, 7.7781, 1), 0.0001));
-
-    R2 = Ainv.mulVector4(&R2);
-
-    try std.testing.expect(R2.approxEqual(&w, 0.0001));
-}
-
-test "Matrix4x4.lookAtRH" {
-    const v = Vector3(f32).init(1, 2, 3);
-    const w = Vector4(f32).init(4, 5, 6, 1);
-    const eye = Vector3(f32).init(0, 0, 0);
-    const center = Vector3(f32).init(0, 1, 1);
-    const up = Vector3(f32).init(0, 1, 0);
-    const A = Matrix4x4(f32).lookAtRH(&eye, &center, &up);
+    const A = Matrix4x4(f32).lookAt(&eye, &center, &up);
     const Ainv = A.lookAtInverse();
     var R1 = A.mulVector3(&v);
 
@@ -9958,33 +9482,11 @@ test "Matrix4x4.lookAtRH" {
     try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "Matrix4x4.perspectiveLHNO" {
+test "Matrix4x4.perspectiveNO" {
     const v = Vector4(f32).init(1, 2, 3, 1);
     const w = Vector4(f32).init(4, 5, 6, 1);
-    const A = Matrix4x4(f32).perspectiveLHNO(std.math.degreesToRadians(90.0), 16.0 / 9.0, 0.1, 100.0);
-    const Ainv = A.perspectiveInverseLH();
-    var R1 = A.mulVector4(&v);
-
-    try std.testing.expect(R1.approxEqual(&Vector4(f32).init(0.5625, 2, 2.8058, 3), 0.0001));
-
-    R1 = Ainv.mulVector4(&R1);
-
-    try std.testing.expect(R1.approxEqual(&v, 0.0001));
-
-    var R2 = A.mulVector4(&w);
-
-    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(2.25, 5, 5.8118, 6), 0.0001));
-
-    R2 = Ainv.mulVector4(&R2);
-
-    try std.testing.expect(R2.approxEqual(&w, 0.0001));
-}
-
-test "Matrix4x4.perspectiveRHNO" {
-    const v = Vector4(f32).init(1, 2, 3, 1);
-    const w = Vector4(f32).init(4, 5, 6, 1);
-    const A = Matrix4x4(f32).perspectiveRHNO(std.math.degreesToRadians(90.0), 16.0 / 9.0, 0.1, 100.0);
-    const Ainv = A.perspectiveInverseRH();
+    const A = Matrix4x4(f32).perspectiveNO(std.math.degreesToRadians(90.0), 16.0 / 9.0, 0.1, 100.0);
+    const Ainv = A.perspectiveInverse();
     var R1 = A.mulVector4(&v);
 
     try std.testing.expect(R1.approxEqual(&Vector4(f32).init(0.5625, 2, -3.2062, -3), 0.0001));
@@ -10002,33 +9504,11 @@ test "Matrix4x4.perspectiveRHNO" {
     try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "Matrix4x4.perspectiveLHZO" {
+test "Matrix4x4.perspectiveZO" {
     const v = Vector4(f32).init(1, 2, 3, 1);
     const w = Vector4(f32).init(4, 5, 6, 1);
-    const A = Matrix4x4(f32).perspectiveLHZO(std.math.degreesToRadians(90.0), 16.0 / 9.0, 0.1, 100.0);
-    const Ainv = A.perspectiveInverseLH();
-    var R1 = A.mulVector4(&v);
-
-    try std.testing.expect(R1.approxEqual(&Vector4(f32).init(0.5625, 2, 2.9029, 3), 0.0001));
-
-    R1 = Ainv.mulVector4(&R1);
-
-    try std.testing.expect(R1.approxEqual(&v, 0.0001));
-
-    var R2 = A.mulVector4(&w);
-
-    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(2.25, 5, 5.9059, 6), 0.0001));
-
-    R2 = Ainv.mulVector4(&R2);
-
-    try std.testing.expect(R2.approxEqual(&w, 0.0001));
-}
-
-test "Matrix4x4.perspectiveRHZO" {
-    const v = Vector4(f32).init(1, 2, 3, 1);
-    const w = Vector4(f32).init(4, 5, 6, 1);
-    const A = Matrix4x4(f32).perspectiveRHZO(std.math.degreesToRadians(90.0), 16.0 / 9.0, 0.1, 100.0);
-    const Ainv = A.perspectiveInverseRH();
+    const A = Matrix4x4(f32).perspectiveZO(std.math.degreesToRadians(90.0), 16.0 / 9.0, 0.1, 100.0);
+    const Ainv = A.perspectiveInverse();
     var R1 = A.mulVector4(&v);
 
     try std.testing.expect(R1.approxEqual(&Vector4(f32).init(0.5625, 2, -3.1031, -3), 0.0001));
@@ -10046,32 +9526,10 @@ test "Matrix4x4.perspectiveRHZO" {
     try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "Matrix4x4.orthographicLHNO" {
+test "Matrix4x4.orthographicNO" {
     const v = Vector4(f32).init(1, 2, 3, 1);
     const w = Vector4(f32).init(4, 5, 6, 1);
-    const A = Matrix4x4(f32).orthographicLHNO(-10.0, 10.0, -10.0, 10.0, 0.1, 100.0);
-    const Ainv = A.orthographicInverse();
-    var R1 = A.mulVector4(&v);
-
-    try std.testing.expect(R1.approxEqual(&Vector4(f32).init(0.1, 0.2, -0.9419, 1), 0.0001));
-
-    R1 = Ainv.mulVector4(&R1);
-
-    try std.testing.expect(R1.approxEqual(&v, 0.0001));
-
-    var R2 = A.mulVector4(&w);
-
-    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(0.4, 0.5, -0.8818, 1), 0.0001));
-
-    R2 = Ainv.mulVector4(&R2);
-
-    try std.testing.expect(R2.approxEqual(&w, 0.0001));
-}
-
-test "Matrix4x4.orthographicRHNO" {
-    const v = Vector4(f32).init(1, 2, 3, 1);
-    const w = Vector4(f32).init(4, 5, 6, 1);
-    const A = Matrix4x4(f32).orthographicRHNO(-10.0, 10.0, -10.0, 10.0, 0.1, 100.0);
+    const A = Matrix4x4(f32).orthographicNO(-10.0, 10.0, -10.0, 10.0, 0.1, 100.0);
     const Ainv = A.orthographicInverse();
     var R1 = A.mulVector4(&v);
 
@@ -10090,32 +9548,10 @@ test "Matrix4x4.orthographicRHNO" {
     try std.testing.expect(R2.approxEqual(&w, 0.0001));
 }
 
-test "Matrix4x4.orthographicLHZO" {
+test "Matrix4x4.orthographicZO" {
     const v = Vector4(f32).init(1, 2, 3, 1);
     const w = Vector4(f32).init(4, 5, 6, 1);
-    const A = Matrix4x4(f32).orthographicLHZO(-10.0, 10.0, -10.0, 10.0, 0.1, 100.0);
-    const Ainv = A.orthographicInverse();
-    var R1 = A.mulVector4(&v);
-
-    try std.testing.expect(R1.approxEqual(&Vector4(f32).init(0.1, 0.2, 0.0290, 1), 0.0001));
-
-    R1 = Ainv.mulVector4(&R1);
-
-    try std.testing.expect(R1.approxEqual(&v, 0.0001));
-
-    var R2 = A.mulVector4(&w);
-
-    try std.testing.expect(R2.approxEqual(&Vector4(f32).init(0.4, 0.5, 0.0590, 1), 0.0001));
-
-    R2 = Ainv.mulVector4(&R2);
-
-    try std.testing.expect(R2.approxEqual(&w, 0.0001));
-}
-
-test "Matrix4x4.orthographicRHZO" {
-    const v = Vector4(f32).init(1, 2, 3, 1);
-    const w = Vector4(f32).init(4, 5, 6, 1);
-    const A = Matrix4x4(f32).orthographicRHZO(-10.0, 10.0, -10.0, 10.0, 0.1, 100.0);
+    const A = Matrix4x4(f32).orthographicZO(-10.0, 10.0, -10.0, 10.0, 0.1, 100.0);
     const Ainv = A.orthographicInverse();
     var R1 = A.mulVector4(&v);
 

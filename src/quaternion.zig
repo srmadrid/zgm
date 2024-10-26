@@ -52,7 +52,7 @@ pub fn Quaternion(comptime T: type) type {
             };
         }
 
-        /// Initialize a left-handed quaternion from the given axis and angle.
+        /// Initialize a quaternion from the given axis and angle.
         ///
         /// **Parameters**:
         /// - `axis`: The axis. Must be normalized.
@@ -60,30 +60,7 @@ pub fn Quaternion(comptime T: type) type {
         ///
         /// **Returns**:
         /// - A new quaternion from the given axis and angle.
-        pub inline fn fromAxisAngleLH(axis: *const Vector3(T), angle: T) Quaternion(T) {
-            const halfAngle = angle / 2;
-            const sinHalfAngle = @sin(-halfAngle);
-            const cosHalfAngle = @cos(halfAngle);
-
-            return Quaternion(T){
-                .v = @Vector(4, T){
-                    axis.v[0] * sinHalfAngle,
-                    axis.v[1] * sinHalfAngle,
-                    axis.v[2] * sinHalfAngle,
-                    cosHalfAngle,
-                },
-            };
-        }
-
-        /// Initialize a right-handed quaternion from the given axis and angle.
-        ///
-        /// **Parameters**:
-        /// - `axis`: The axis. Must be normalized.
-        /// - `angle`: The angle.
-        ///
-        /// **Returns**:
-        /// - A new quaternion from the given axis and angle.
-        pub inline fn fromAxisAngleRH(axis: *const Vector3(T), angle: T) Quaternion(T) {
+        pub inline fn fromAxisAngle(axis: *const Vector3(T), angle: T) Quaternion(T) {
             const halfAngle = angle / 2;
             const sinHalfAngle = @sin(halfAngle);
             const cosHalfAngle = @cos(halfAngle);
@@ -98,8 +75,8 @@ pub fn Quaternion(comptime T: type) type {
             };
         }
 
-        /// Initialize a left-handed quaternion from rotation needed to rotate
-        /// one vector to another.
+        /// Initialize a quaternion from rotation needed to rotate one vector to
+        /// another.
         ///
         /// **Parameters**:
         /// - `from`: The first vector. Must be normalized.
@@ -107,9 +84,9 @@ pub fn Quaternion(comptime T: type) type {
         ///
         /// **Returns**:
         /// - A new quaternion from the given vectors.
-        pub inline fn fromPairLH(from: *const Vector3(T), to: *const Vector3(T)) Quaternion(T) {
+        pub inline fn fromPair(from: *const Vector3(T), to: *const Vector3(T)) Quaternion(T) {
             const dott = from.dot(to);
-            const cross = from.crossLH(to);
+            const cross = from.cross(to);
 
             const q = Quaternion(T){
                 .v = @Vector(4, T){
@@ -123,32 +100,7 @@ pub fn Quaternion(comptime T: type) type {
             return q.normalize();
         }
 
-        /// Initialize a right-handed quaternion from rotation needed to rotate
-        /// one vector to another.
-        ///
-        /// **Parameters**:
-        /// - `from`: The first vector. Must be normalized.
-        /// - `to`: The second vector. Must be normalized.
-        ///
-        /// **Returns**:
-        /// - A new quaternion from the given vectors.
-        pub inline fn fromPairRH(from: *const Vector3(T), to: *const Vector3(T)) Quaternion(T) {
-            const dott = from.dot(to);
-            const cross = from.crossRH(to);
-
-            const q = Quaternion(T){
-                .v = @Vector(4, T){
-                    cross.v[0],
-                    cross.v[1],
-                    cross.v[2],
-                    1 + dott,
-                },
-            };
-
-            return q.normalize();
-        }
-
-        /// Initialize a left-handed quaternion from the given Euler angles.
+        /// Initialize a quaternion from the given Euler angles.
         ///
         /// **Parameters**:
         /// - `pitch`: The pitch angle.
@@ -157,39 +109,7 @@ pub fn Quaternion(comptime T: type) type {
         ///
         /// **Returns**:
         /// - A new quaternion from the given Euler angles.
-        pub inline fn fromEulerLH(pitch: T, yaw: T, roll: T) Quaternion(T) {
-            const halfPitch = pitch / 2;
-            const sp = @sin(halfPitch);
-            const cp = @cos(halfPitch);
-
-            const halfYaw = yaw / 2;
-            const sy = @sin(halfYaw);
-            const cy = @cos(halfYaw);
-
-            const halfRoll = roll / 2;
-            const sr = @sin(halfRoll);
-            const cr = @cos(halfRoll);
-
-            return Quaternion(T){
-                .v = @Vector(4, T){
-                    -(cy * cp * sr - sy * sp * cr),
-                    -(cy * sp * cr + sy * cp * sr),
-                    -(sy * cp * cr - cy * sp * sr),
-                    cy * cp * cr + sy * sp * sr,
-                },
-            };
-        }
-
-        /// Initialize a right-handed quaternion from the given Euler angles.
-        ///
-        /// **Parameters**:
-        /// - `pitch`: The pitch angle.
-        /// - `yaw`: The yaw angle.
-        /// - `roll`: The roll angle.
-        ///
-        /// **Returns**:
-        /// - A new quaternion from the given Euler angles.
-        pub inline fn fromEulerRH(pitch: T, yaw: T, roll: T) Quaternion(T) {
+        pub inline fn fromEuler(pitch: T, yaw: T, roll: T) Quaternion(T) {
             const halfPitch = pitch / 2;
             const sp = @sin(halfPitch);
             const cp = @cos(halfPitch);
@@ -219,7 +139,7 @@ pub fn Quaternion(comptime T: type) type {
         ///
         /// **Returns**:
         /// - A new quaternion from the given rotation matrix.
-        pub inline fn fromMatrix(A: *const Matrix4x4(T)) Quaternion(T) {
+        pub inline fn fromMatrix4x4(A: *const Matrix4x4(T)) Quaternion(T) {
             const trace = A.m[0].v[0] + A.m[1].v[1] + A.m[2].v[2];
             const tracePlusOne = trace + 1;
 
@@ -694,7 +614,7 @@ test "Quaternion.mulScalar" {
 }
 
 test "Quaternion.mulVector3" {
-    const q = Quaternion(f32).fromAxisAngleRH(&Vector3(f32).init(1, 0, 0).normalize(), std.math.pi / 2.0);
+    const q = Quaternion(f32).fromAxisAngle(&Vector3(f32).init(1, 0, 0).normalize(), std.math.pi / 2.0);
     const v = Vector3(f32).init(0, 1, 0);
     const r = q.mulVector3(&v);
 
@@ -702,7 +622,7 @@ test "Quaternion.mulVector3" {
 }
 
 test "Quaternion.mulVector4" {
-    const q = Quaternion(f32).fromAxisAngleRH(&Vector3(f32).init(1, 0, 0).normalize(), std.math.pi / 2.0);
+    const q = Quaternion(f32).fromAxisAngle(&Vector3(f32).init(1, 0, 0).normalize(), std.math.pi / 2.0);
     const v = Vector4(f32).init(0, 1, 0, 1);
     const r = q.mulVector4(&v);
 
@@ -799,26 +719,34 @@ test "Quaternion.slerp" {
     try std.testing.expect(r.approxEqual(&Quaternion(f32).init(0.3234, 0.4313, 0.5391, 0.6469), 0.0001));
 }
 
-test "Quaternion.fromAxisAngleLH" {
-    const q = Quaternion(f32).fromAxisAngleLH(&Vector3(f32).init(1, 0, 0), std.math.pi / 2.0);
-    const v = Vector3(f32).init(0, 1, 0);
-    const r = q.mulVector3(&v);
-
-    try std.testing.expect(r.approxEqual(&Vector3(f32).init(0, 0, -1), 0.0001));
-}
-
-test "Quaternion.fromAxisAngleRH" {
-    const q = Quaternion(f32).fromAxisAngleRH(&Vector3(f32).init(1, 0, 0), std.math.pi / 2.0);
+test "Quaternion.fromAxisAngle" {
+    const q = Quaternion(f32).fromAxisAngle(&Vector3(f32).init(1, 0, 0), std.math.pi / 2.0);
     const v = Vector3(f32).init(0, 1, 0);
     const r = q.mulVector3(&v);
 
     try std.testing.expect(r.approxEqual(&Vector3(f32).init(0, 0, 1), 0.0001));
 }
 
-test "Quaternion.fromPairLH" {
-    const q = Quaternion(f32).fromPairLH(&Vector3(f32).init(1, 0, 0).normalize(), &Vector3(f32).init(0, 1, 0).normalize());
+test "Quaternion.fromPair" {
+    const q = Quaternion(f32).fromPair(&Vector3(f32).init(1, 0, 0).normalize(), &Vector3(f32).init(0, 1, 0).normalize());
     const v = Vector3(f32).init(0, 1, 0);
     const r = q.mulVector3(&v);
 
     try std.testing.expect(r.approxEqual(&Vector3(f32).init(-1, 0, 0), 0.0001));
+}
+
+test "Quaternion.fromEuler" {
+    const q = Quaternion(f32).fromEuler(std.math.pi / 2.0, 0, 0);
+    const v = Vector3(f32).init(0, 1, 0);
+    const r = q.mulVector3(&v);
+
+    try std.testing.expect(r.approxEqual(&Vector3(f32).init(0, 1, 0), 0.0001));
+}
+
+test "Quaternion.fromMatrix" {
+    const q = Quaternion(f32).fromMatrix4x4(&Matrix4x4(f32).rotate(std.math.pi / 2.0, &Vector3(f32).init(1, 0, 0)));
+    const v = Vector3(f32).init(0, 1, 0);
+    const r = q.mulVector3(&v);
+
+    try std.testing.expect(r.approxEqual(&Vector3(f32).init(0, 0, 1), 0.0001));
 }
