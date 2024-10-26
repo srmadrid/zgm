@@ -193,7 +193,7 @@ pub fn Quaternion(comptime T: type) type {
         ///
         /// **Returns**:
         /// - A new 4x4 rotation matrix from the quaternion.
-        pub inline fn toMatrix(q: *const Quaternion(T)) Matrix4x4(T) {
+        pub inline fn toMatrix4x4(q: *const Quaternion(T)) Matrix4x4(T) {
             const xx = q.v[0] * q.v[0];
             const xy = q.v[0] * q.v[1];
             const xz = q.v[0] * q.v[2];
@@ -743,10 +743,17 @@ test "Quaternion.fromEuler" {
     try std.testing.expect(r.approxEqual(&Vector3(f32).init(0, 1, 0), 0.0001));
 }
 
-test "Quaternion.fromMatrix" {
+test "Quaternion.fromMatrix4x4" {
     const q = Quaternion(f32).fromMatrix4x4(&Matrix4x4(f32).rotate(std.math.pi / 2.0, &Vector3(f32).init(1, 0, 0)));
     const v = Vector3(f32).init(0, 1, 0);
     const r = q.mulVector3(&v);
 
     try std.testing.expect(r.approxEqual(&Vector3(f32).init(0, 0, 1), 0.0001));
+}
+
+test "Quaternion.toMatrix4x4" {
+    const q = Quaternion(f32).fromAxisAngle(&Vector3(f32).init(1, 0, 0), std.math.pi / 2.0);
+    const r = q.toMatrix4x4();
+
+    try std.testing.expect(r.approxEqual(&Matrix4x4(f32).rotate(std.math.pi / 2.0, &Vector3(f32).init(1, 0, 0)), 0.0001));
 }

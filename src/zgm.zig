@@ -16,6 +16,14 @@ pub const Matrix4x4 = @import("matrix.zig").Matrix4x4;
 
 pub const Quaternion = @import("quaternion.zig").Quaternion;
 
+pub const RGB = @import("color.zig").RGB;
+pub const RGBA = @import("color.zig").RGBA;
+pub const HSL = @import("color.zig").HSL;
+pub const HSLA = @import("color.zig").HSLA;
+pub const HSV = @import("color.zig").HSV;
+pub const HSVA = @import("color.zig").HSVA;
+pub const CMYK = @import("color.zig").CMYK;
+
 test {
     std.testing.refAllDeclsRecursive(@This());
 }
