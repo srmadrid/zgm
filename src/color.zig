@@ -141,7 +141,7 @@ pub const RGB = struct {
             }
         }
 
-        return HSV{ .v = @Vector(3, f32){ h / 360.0, s, v } };
+        return HSV{ .vv = @Vector(3, f32){ h / 360.0, s, v } };
     }
 
     /// Convert the RGB color to the HSVA color space.
@@ -155,7 +155,7 @@ pub const RGB = struct {
     /// - The HSVA color equivalent to the given RGB color.
     pub inline fn toHSVA(c: *const RGB, as: f32) HSVA {
         const hsv = c.toHSV();
-        return HSVA{ .v = @Vector(4, f32){ hsv.v[0], hsv.v[1], hsv.v[2], as } };
+        return HSVA{ .vv = @Vector(4, f32){ hsv.vv[0], hsv.vv[1], hsv.vv[2], as } };
     }
 
     /// Convert the RGB color to the CMYK color space.
@@ -446,7 +446,7 @@ pub const HSL = struct {
             ss = 2.0 * (v - c.v[2]) / v;
         }
 
-        return HSV{ .v = @Vector(3, f32){ c.v[0], ss, v } };
+        return HSV{ .vv = @Vector(3, f32){ c.v[0], ss, v } };
     }
 
     /// Convert the HSL color to the HSVA color space.
@@ -460,7 +460,7 @@ pub const HSL = struct {
     /// - The HSVA color equivalent to the given HSL color.
     pub inline fn toHSVA(c: *const HSL, as: f32) HSVA {
         const hsv = c.toHSV();
-        return HSVA{ .v = @Vector(4, f32){ hsv.v[0], hsv.v[1], hsv.v[2], as } };
+        return HSVA{ .vv = @Vector(4, f32){ hsv.vv[0], hsv.vv[1], hsv.vv[2], as } };
     }
 
     /// Convert the HSL color to the CMYK color space.
@@ -631,7 +631,7 @@ pub const HSLA = struct {
 
 /// A color in the HSV color space.
 pub const HSV = struct {
-    v: @Vector(3, f32),
+    vv: @Vector(3, f32),
 
     /// Create a new color from the given hue, saturation, and value components.
     /// Each component should be in the range [0, 1].
@@ -644,19 +644,19 @@ pub const HSV = struct {
     /// **Returns**:
     /// - A new color with the given components.
     pub fn init(hs: f32, ss: f32, vs: f32) HSV {
-        return HSV{ .v = @Vector(3, f32){ hs, ss, vs } };
+        return HSV{ .vv = @Vector(3, f32){ hs, ss, vs } };
     }
 
     pub inline fn h(self: *const HSV) f32 {
-        return self.v[0];
+        return self.vv[0];
     }
 
     pub inline fn s(self: *const HSV) f32 {
-        return self.v[1];
+        return self.vv[1];
     }
 
     pub inline fn v(self: *const HSV) f32 {
-        return self.v[2];
+        return self.vv[2];
     }
 
     /// Convert the HSV color to the RGB color space.
@@ -667,14 +667,14 @@ pub const HSV = struct {
     /// **Returns**:
     /// - The RGB color equivalent to the given HSV color.
     pub inline fn toRGB(c: *const HSV) RGB {
-        if (c.v[1] == 0.0) {
-            return RGB.init(c.v[2], c.v[2], c.v[2]);
+        if (c.vv[1] == 0.0) {
+            return RGB.init(c.vv[2], c.vv[2], c.vv[2]);
         }
 
-        const Hx6 = c.v[0] * 6.0;
-        const C = c.v[2] * c.v[1];
+        const Hx6 = c.vv[0] * 6.0;
+        const C = c.vv[2] * c.vv[1];
         const X = C * (1.0 - @abs(@mod(Hx6, 2) - 1.0));
-        const m = c.v[2] - C;
+        const m = c.vv[2] - C;
 
         if (Hx6 < 1.0) {
             return RGB{ .v = @Vector(3, f32){ C + m, X + m, m } };
@@ -712,16 +712,16 @@ pub const HSV = struct {
     /// **Returns**:
     /// - The HSL color equivalent to the given HSV color.
     pub inline fn toHSL(c: *const HSV) HSL {
-        const l = c.v[2] * (1.0 - c.v[1] / 2.0);
+        const l = c.vv[2] * (1.0 - c.vv[1] / 2.0);
 
         var ss: f32 = undefined;
         if (l == 0.0 or l == 1.0) {
             ss = 0.0;
         } else {
-            ss = (c.v[2] - l) / @min(l, 1.0 - l);
+            ss = (c.vv[2] - l) / @min(l, 1.0 - l);
         }
 
-        return HSL{ .v = @Vector(3, f32){ c.v[0], ss, l } };
+        return HSL{ .v = @Vector(3, f32){ c.vv[0], ss, l } };
     }
 
     /// Convert the HSV color to the HSLA color space.
@@ -747,7 +747,7 @@ pub const HSV = struct {
     /// **Returns**:
     /// - The HSVA color equivalent to the given HSV color.
     pub inline fn toHSVA(c: *const HSV, as: f32) HSVA {
-        return HSVA{ .v = @Vector(4, f32){ c.v[0], c.v[1], c.v[2], as } };
+        return HSVA{ .vv = @Vector(4, f32){ c.vv[0], c.vv[1], c.vv[2], as } };
     }
 
     /// Convert the HSV color to the CMYK color space.
@@ -770,7 +770,7 @@ pub const HSV = struct {
     /// **Returns**:
     /// - `true` if the colors are equal, `false` otherwise.
     pub inline fn equal(c: *const HSV, d: *const HSV) bool {
-        return c.v[0] == d.v[0] and c.v[1] == d.v[1] and c.v[2] == d.v[2];
+        return c.vv[0] == d.vv[0] and c.vv[1] == d.vv[1] and c.vv[2] == d.vv[2];
     }
 
     /// Compares two HSV colors and returns true if they are approximately
@@ -784,13 +784,13 @@ pub const HSV = struct {
     /// **Returns**:
     /// - `true` if the colors are approximately equal, `false` otherwise.
     pub inline fn approxEqual(c: *const HSV, d: *const HSV, tolerance: f32) bool {
-        return @abs(c.v[0] - d.v[0]) <= tolerance and @abs(c.v[1] - d.v[1]) <= tolerance and @abs(c.v[2] - d.v[2]) <= tolerance;
+        return @abs(c.vv[0] - d.vv[0]) <= tolerance and @abs(c.vv[1] - d.vv[1]) <= tolerance and @abs(c.vv[2] - d.vv[2]) <= tolerance;
     }
 };
 
 /// A color in the HSVA color space.
 pub const HSVA = struct {
-    v: @Vector(4, f32),
+    vv: @Vector(4, f32),
 
     /// Create a new color from the given hue, saturation, value, and alpha components.
     /// Each component should be in the range [0, 1].
@@ -804,23 +804,23 @@ pub const HSVA = struct {
     /// **Returns**:
     /// - A new color with the given components.
     pub fn init(hs: f32, ss: f32, vs: f32, as: f32) HSVA {
-        return HSVA{ .v = @Vector(4, f32){ hs, ss, vs, as } };
+        return HSVA{ .vv = @Vector(4, f32){ hs, ss, vs, as } };
     }
 
     pub inline fn h(self: *const HSVA) f32 {
-        return self.v[0];
+        return self.vv[0];
     }
 
     pub inline fn s(self: *const HSVA) f32 {
-        return self.v[1];
+        return self.vv[1];
     }
 
     pub inline fn v(self: *const HSVA) f32 {
-        return self.v[2];
+        return self.vv[2];
     }
 
     pub inline fn a(self: *const HSVA) f32 {
-        return self.v[3];
+        return self.vv[3];
     }
 
     /// Convert the HSVA color to the RGB color space.
@@ -842,7 +842,7 @@ pub const HSVA = struct {
     /// **Returns**:
     /// - The RGBA color equivalent to the given HSVA color.
     pub inline fn toRGBA(c: *const HSVA) RGBA {
-        return c.toHSV().toRGBA(c.v[3]);
+        return c.toHSV().toRGBA(c.vv[3]);
     }
 
     /// Convert the HSVA color to the HSL color space.
@@ -864,7 +864,7 @@ pub const HSVA = struct {
     /// **Returns**:
     /// - The HSLA color equivalent to the given HSVA color.
     pub inline fn toHSLA(c: *const HSVA) HSLA {
-        return c.toHSV().toHSLA(c.v[3]);
+        return c.toHSV().toHSLA(c.vv[3]);
     }
 
     /// Convert the HSVA color to the HSV color space.
@@ -875,7 +875,7 @@ pub const HSVA = struct {
     /// **Returns**:
     /// - The HSV color equivalent to the given HSVA color.
     pub inline fn toHSV(c: *const HSVA) HSV {
-        return HSV{ .v = @Vector(3, f32){ c.v[0], c.v[1], c.v[2] } };
+        return HSV{ .vv = @Vector(3, f32){ c.vv[0], c.vv[1], c.vv[2] } };
     }
 
     /// Convert the HSVA color to the CMYK color space.
@@ -898,7 +898,7 @@ pub const HSVA = struct {
     /// **Returns**:
     /// - `true` if the colors are equal, `false` otherwise.
     pub inline fn equal(c: *const HSVA, d: *const HSVA) bool {
-        return c.v[0] == d.v[0] and c.v[1] == d.v[1] and c.v[2] == d.v[2] and c.v[3] == d.v[3];
+        return c.vv[0] == d.vv[0] and c.vv[1] == d.vv[1] and c.vv[2] == d.vv[2] and c.vv[3] == d.vv[3];
     }
 
     /// Compares two HSVA colors and returns true if they are approximately
@@ -912,7 +912,7 @@ pub const HSVA = struct {
     /// **Returns**:
     /// - `true` if the colors are approximately equal, `false` otherwise.
     pub inline fn approxEqual(c: *const HSVA, d: *const HSVA, tolerance: f32) bool {
-        return @abs(c.v[0] - d.v[0]) <= tolerance and @abs(c.v[1] - d.v[1]) <= tolerance and @abs(c.v[2] - d.v[2]) <= tolerance and @abs(c.v[3] - d.v[3]) <= tolerance;
+        return @abs(c.vv[0] - d.vv[0]) <= tolerance and @abs(c.vv[1] - d.vv[1]) <= tolerance and @abs(c.vv[2] - d.vv[2]) <= tolerance and @abs(c.vv[3] - d.vv[3]) <= tolerance;
     }
 };
 
