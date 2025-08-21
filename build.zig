@@ -6,23 +6,26 @@ pub fn build(b: *std.Build) void {
 
     const module = b.addModule("zgm", .{
         .root_source_file = b.path("src/zgm.zig"),
+        .target = target,
+        .optimize = optimize,
     });
 
     // Library
-    const lib = b.addStaticLibrary(.{
+    const lib = b.addLibrary(.{
+        .linkage = .dynamic,
         .name = "zgm",
-        .root_source_file = b.path("src/zgm.zig"),
-        .target = target,
-        .optimize = optimize,
+        .root_module = module,
     });
     b.installArtifact(lib);
 
     // Executable (for testing)
     const exe = b.addExecutable(.{
         .name = "zgm",
-        .root_source_file = b.path("src/main.zig"),
-        .target = target,
-        .optimize = optimize,
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/main.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
     });
     b.installArtifact(exe);
     const run_cmd = b.addRunArtifact(exe);
@@ -32,30 +35,11 @@ pub fn build(b: *std.Build) void {
 
     // Tests
     const lib_unit_tests = b.addTest(.{
-        .root_source_file = b.path("src/zgm.zig"),
-        .target = target,
-        .optimize = optimize,
+        .root_module = module,
     });
     const run_lib_unit_tests = b.addRunArtifact(lib_unit_tests);
     const test_step = b.step("test", "Run unit tests");
     test_step.dependOn(&run_lib_unit_tests.step);
-
-    // Examples
-    const example_step = b.step("examples", "Build examples");
-    for ([_][]const u8{
-        "ndarray_add",
-    }) |example_name| {
-        const example = b.addExecutable(.{
-            .name = example_name,
-            .root_source_file = b.path(b.fmt("examples/{s}.zig", .{example_name})),
-            .target = target,
-            .optimize = optimize,
-        });
-        const install_example = b.addInstallArtifact(example, .{});
-        example.root_module.addImport("zgm", module);
-        example_step.dependOn(&example.step);
-        example_step.dependOn(&install_example.step);
-    }
 
     // Steps
     const check_step = b.step("check", "Check if the code compiles; this is for ZLS.");
